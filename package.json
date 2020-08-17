@@ -1,0 +1,22 @@
+{
+  "name": "homebridge-remootio",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Remootio",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronniepettersson/homebridge-remootio.git"
+  },
+  "author": "Ronnie Pettersson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ronniepettersson/homebridge-remootio/issues"
+  },
+  "homepage": "https://github.com/ronniepettersson/homebridge-remootio#readme",
+  "dependencies": {
+    "remootio-api-client": "^1.0.2"
+  }
+}
