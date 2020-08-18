@@ -10,5 +10,5 @@ let hap: HAP;
  */
 export = (api: API) => {
   hap = api.hap;
-  api.registerAccessory("RemootioGarageDoorOpenerPlugin", RemootioHomebridgeAccessory);
+  api.registerAccessory("Remootio", RemootioHomebridgeAccessory);
 };
