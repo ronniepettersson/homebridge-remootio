@@ -9,6 +9,9 @@
     "build": "rm -rf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build"
   },
+  "keywords": [
+    "homebridge-plugin"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ronniepettersson/homebridge-remootio.git"
