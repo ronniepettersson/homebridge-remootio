@@ -12,6 +12,9 @@
   "keywords": [
     "homebridge-plugin"
   ],
+  "engines": {
+    "homebridge": ">=1.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ronniepettersson/homebridge-remootio.git"
