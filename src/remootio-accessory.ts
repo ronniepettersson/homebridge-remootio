@@ -3,6 +3,7 @@ import {
   AccessoryConfig,
   AccessoryPlugin,
   API,
+  HAP,
   CharacteristicEventTypes,
   CharacteristicGetCallback,
   CharacteristicSetCallback,
@@ -11,6 +12,7 @@ import {
   Service,
 } from 'homebridge';
 
+let hap: HAP;
 
 import RemootioDevice = require('remootio-api-client');
 
@@ -110,7 +112,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
     private readonly log: Logging;
     private readonly api: API;
-    private readonly hap;
+    private readonly hap: HAP;
     private readonly name: string;
     
     // TODO
@@ -137,7 +139,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.log = log;
       
       this.currentDoorState = this.hap.Characteristic.CurrentDoorState;
-      this.targetDoorState = this.hap.Characteristic.targetDoorState;
+      this.targetDoorState = this.hap.Characteristic.TargetDoorState;
       
       // From configuration of this accessory
       this.name = config.name;
@@ -165,7 +167,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
       this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.TargetDoorState)
-        .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
+        .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this));
+  
+      this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.TargetDoorState)
         .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
           // call sendOpen or sendClose
           this.targetState = value as number;
@@ -263,7 +267,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     }
 
     getTargetStateHandler(callback: CharacteristicGetCallback): void {
-      this.log.debug('getTargetStateHandler: Target door state: [' + this.currentState + '] ' + 
+      this.log.debug('getTargetStateHandler: Target door state: [' + this.targetState + '] ' + 
         (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Closed'));
       if(this.targetState < 0 ) {
         this.device.sendQuery();
