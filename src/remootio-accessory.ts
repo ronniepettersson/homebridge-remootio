@@ -14,6 +14,10 @@ import {
 
 import RemootioDevice = require('remootio-api-client');
 
+interface RemootioChallenge {
+  sessionKey: string,
+  initialActionId: number
+}
 interface RemootioEvent {
   event: {
     cnt: number,
@@ -24,6 +28,17 @@ interface RemootioEvent {
       keyNr: number,
       keyType: string,
       via: string
+    }
+  }
+}
+interface RemootioLeftOpen {
+  event: {
+    cnt: number,
+    type: string,
+    state: string,
+    t100ms: number,
+    data: {
+      timeOpen100ms: number
     }
   }
 }
@@ -39,7 +54,9 @@ interface RemootioResponse {
   }
 }
 
-type RemootioMessage = RemootioResponse & RemootioEvent;
+
+
+type RemootioMessage = RemootioChallenge & RemootioResponse & RemootioEvent & RemootioLeftOpen;
 
 let device: RemootioDevice;
 
