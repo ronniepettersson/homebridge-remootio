@@ -7,12 +7,10 @@ import {
   CharacteristicGetCallback,
   CharacteristicSetCallback,
   CharacteristicValue,
-  HAP,
   Logging,
   Service,
 } from 'homebridge';
 
-let hap: HAP;
 
 import RemootioDevice = require('remootio-api-client');
 
@@ -76,10 +74,10 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
 
       
-      this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.CurrentDoorState)
+      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.CurrentDoorState)
         .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
-      this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.TargetDoorState)
+      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.TargetDoorState)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
           // TODO -> call .sendQuery() 
           log.info('Target state of the Garage Door Opener was returned: ' + (this.targetDoorState ? 'Closed': 'Open'));
@@ -92,7 +90,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
           callback();
         });
       
-      this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.ObstructionDetected)
+      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.ObstructionDetected)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
           // Dummy return
           log.info('ObstructionDetected was requested' );
@@ -100,9 +98,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         });   
 
 
-      this.informationService = new hap.Service.AccessoryInformation()
-        .setCharacteristic(hap.Characteristic.Manufacturer, 'Remootio')
-        .setCharacteristic(hap.Characteristic.Model, 'Remootio');
+      this.informationService = new api.hap.Service.AccessoryInformation()
+        .setCharacteristic(api.hap.Characteristic.Manufacturer, 'Remootio')
+        .setCharacteristic(api.hap.Characteristic.Model, 'Remootio');
 
       
       this.device.addListener('connecting', ()=>{
