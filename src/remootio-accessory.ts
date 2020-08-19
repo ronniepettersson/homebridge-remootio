@@ -14,11 +14,42 @@ import {
 
 import RemootioDevice = require('remootio-api-client');
 
-interface RemootioChallenge {
-  sessionKey: string,
-  initialActionId: number
+type RemootioEncryptedPayload = {
+  type: 'ENCRYPTED',
+  data: {
+    payload: string,
+    iv: string
+  },
+  mac: string
 }
-interface RemootioEvent {
+type RemootioError = {
+  type: 'ERROR',
+  errorMessage: string
+}
+type RemootioPing = {
+  type: 'PING'
+}
+type RemootioHello = {
+  type: 'HELLO',
+  apiVersion: number,
+  message: string
+}
+
+interface RemootioChallenge {
+  challenge: {
+    sessionKey: string,
+    initialActionId: number
+  }
+}
+interface RemootioStateChangeEvent {
+  event: {
+    cnt: number,
+    type: string,
+    state: string,
+    t100ms: number,
+  }
+}
+interface RemootioTriggeredEvent {
   event: {
     cnt: number,
     type: string,
@@ -34,7 +65,7 @@ interface RemootioEvent {
 interface RemootioLeftOpen {
   event: {
     cnt: number,
-    type: string,
+    type: 'LeftOpen',
     state: string,
     t100ms: number,
     data: {
@@ -56,7 +87,22 @@ interface RemootioResponse {
 
 
 
-type RemootioMessage = RemootioChallenge & RemootioResponse & RemootioEvent & RemootioLeftOpen;
+type RemootioTypedFrame = 
+  RemootioEncryptedPayload |  
+  RemootioError |
+  RemootioPing |
+  RemootioHello;
+
+type RemootioFrame = 
+  RemootioTypedFrame &
+  RemootioChallenge;
+
+
+type RemootioDecryptedPayload = 
+  RemootioStateChangeEvent &
+  RemootioTriggeredEvent & 
+  RemootioLeftOpen & 
+  RemootioResponse;
 
 let device: RemootioDevice;
 
@@ -143,26 +189,29 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage', (frame: unknown, payload) => this.handleIncomingMessage(payload));
+      this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => 
+        this.handleIncomingMessage(frame, decryptedPayload));
 
       this.device.connect(true);
 
       log.info('Remootio Garage Door Opener finished initializing!');
     }
     
-    handleIncomingMessage(decryptedPayload: RemootioMessage ) : void {
-      if (decryptedPayload !== null ){
+    handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload ) : void {
+      if (decryptedPayload !== undefined ){
         const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
         this.log.info(rowToLog);
-        //We are interested in events 
-        //if (decryptedPayload.event !== undefined ){ //It's an event frame containing a log entry from Remootio
-        //  const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-        //  this.log.info(rowToLog);
-        //}
-        //if (decryptedPayload.response !== undefined){ //It's an event frame containing a log entry from Remootio
-        //  const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-        //  this.log.info(rowToLog);
-        //}
+
+      } else { 
+        if (frame !== undefined) {
+          if(frame.challenge === undefined && frame.type !== undefined ) {
+            const rowToLog = new Date().toISOString() + ' ' + frame.type + '\r\n';
+            this.log.info(rowToLog);
+          } else if ( frame.challenge !== undefined ){
+            const rowToLog = new Date().toISOString() + ' Challenge \r\n';
+            this.log.info(rowToLog);
+          }
+        }
       }
 
     }
