@@ -19,7 +19,12 @@ interface RemootioEvent {
     cnt: number,
     type: string,
     state: string,
-    t100ms: number
+    t100ms: number,
+    data: {
+      keyNr: number,
+      keyType: string,
+      via: string
+    }
   }
 }
 interface RemootioResponse {
@@ -130,15 +135,17 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     
     handleIncomingMessage(decryptedPayload: RemootioMessage ) : void {
       if (decryptedPayload !== null ){
+        const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+        this.log.info(rowToLog);
         //We are interested in events 
-        if (decryptedPayload.event ){ //It's an event frame containing a log entry from Remootio
-          const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-          this.log.info(rowToLog);
-        }
-        if (decryptedPayload.response ){ //It's an event frame containing a log entry from Remootio
-          const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-          this.log.info(rowToLog);
-        }
+        //if (decryptedPayload.event !== undefined ){ //It's an event frame containing a log entry from Remootio
+        //  const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+        //  this.log.info(rowToLog);
+        //}
+        //if (decryptedPayload.response !== undefined){ //It's an event frame containing a log entry from Remootio
+        //  const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+        //  this.log.info(rowToLog);
+        //}
       }
 
     }
