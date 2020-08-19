@@ -1,18 +1,18 @@
 
 import {
-    AccessoryConfig,
-    AccessoryPlugin,
-//    API,
-    CharacteristicEventTypes,
-    CharacteristicGetCallback,
-    CharacteristicSetCallback,
-    CharacteristicValue,
-    HAP,
-    Logging,
-    Service
-  } from "homebridge";
+  AccessoryConfig,
+  AccessoryPlugin,
+  //    API,
+  CharacteristicEventTypes,
+  CharacteristicGetCallback,
+  CharacteristicSetCallback,
+  CharacteristicValue,
+  HAP,
+  Logging,
+  Service,
+} from 'homebridge';
 
-import RemootioDevice  = require("remootio-api-client");
+import RemootioDevice = require('remootio-api-client');
 
 interface RemootioEvent {
   event: {
@@ -65,8 +65,8 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.ip_address = config.apt_auth_key;
 
       device = new RemootioDevice(this.ip_address,
-                                        this.api_secret_key,
-                                        this.apt_auth_key);
+        this.api_secret_key,
+        this.apt_auth_key);
       this.device = device;
 
   
@@ -79,61 +79,61 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
       this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.TargetDoorState)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-            // TODO -> call .sendQuery() 
-            log.info("Target state of the Garage Door Opener was returned: " + (this.targetDoorState ? "Closed": "Open"));
-            callback(undefined, this.targetDoorState);
+          // TODO -> call .sendQuery() 
+          log.info('Target state of the Garage Door Opener was returned: ' + (this.targetDoorState ? 'Closed': 'Open'));
+          callback(undefined, this.targetDoorState);
         })          
         .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-            // call sendOpen or sendClose
-            this.targetDoorState = value as number;
-            log.info("Target state was set to: " + (this.targetDoorState? "Close": "Open"));
-            callback();
+          // call sendOpen or sendClose
+          this.targetDoorState = value as number;
+          log.info('Target state was set to: ' + (this.targetDoorState? 'Close': 'Open'));
+          callback();
         });
       
-        this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.ObstructionDetected)
+      this.garageDoorOpenerService.getCharacteristic(hap.Characteristic.ObstructionDetected)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-            // Dummy return
-            log.info("ObstructionDetected was requested" );
-            callback(undefined, false);
-        })   
+          // Dummy return
+          log.info('ObstructionDetected was requested' );
+          callback(undefined, false);
+        });   
 
 
       this.informationService = new hap.Service.AccessoryInformation()
-        .setCharacteristic(hap.Characteristic.Manufacturer, "Remootio")
-        .setCharacteristic(hap.Characteristic.Model, "Remootio");
+        .setCharacteristic(hap.Characteristic.Manufacturer, 'Remootio')
+        .setCharacteristic(hap.Characteristic.Model, 'Remootio');
 
       
-      this.device.addListener('connecting',()=>{
+      this.device.addListener('connecting', ()=>{
         log.info(this.name + ' connecting ...');
       });
 
-      this.device.addListener('connected',()=>{
+      this.device.addListener('connected', ()=>{
         log.info(this.name + ' connected');
         this.device.authenticate(); //Authenticate the session (required)
       });
       
-      this.device.addListener('authenticated',()=>{
+      this.device.addListener('authenticated', ()=>{
         log.info(this.name + ' conneauthenticated');
         this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage',(frame: unknown ,payload) => this.handleIncomingMessage(payload))
+      this.device.addListener('incomingmessage', (frame: unknown, payload) => this.handleIncomingMessage(payload));
 
       this.device.connect(true);
 
-      log.info("Remootio Garage Door Opener finished initializing!");
+      log.info('Remootio Garage Door Opener finished initializing!');
     }
     
-    handleIncomingMessage(decryptedPayload: RemootioMessage  ) : void {
+    handleIncomingMessage(decryptedPayload: RemootioMessage ) : void {
       if (decryptedPayload !== null ){
         //We are interested in events 
         if (decryptedPayload.event ){ //It's an event frame containing a log entry from Remootio
-            const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-            this.log.info(rowToLog);
+          const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+          this.log.info(rowToLog);
         }
         if (decryptedPayload.response ){ //It's an event frame containing a log entry from Remootio
-            const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
-            this.log.info(rowToLog);
+          const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+          this.log.info(rowToLog);
         }
       }
 
@@ -142,14 +142,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
     getCurrentStateHandler(callback: CharacteristicGetCallback): void {
  
-        this.device.sendQuery();
-        this.log.info("Current state of the Garage Door Opener was returned: " + (this.currentDoorState ? "Closed": "Open"));
-        callback(null, this.currentDoorState);
+      this.device.sendQuery();
+      this.log.info('Current state of the Garage Door Opener was returned: ' + (this.currentDoorState ? 'Closed': 'Open'));
+      callback(null, this.currentDoorState);
     }
 
     setTargetStateHandler(callback: CharacteristicSetCallback): void {
 
-        callback(null);
+      callback(null);
     }
 
 
@@ -158,7 +158,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
      * Typical this only ever happens at the pairing process.
      */
     identify(): void {
-      this.log("Identify!");
+      this.log('Identify!');
     }
   
     /*
@@ -172,6 +172,6 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       ];
     }
   
-  }
+}
 
 
