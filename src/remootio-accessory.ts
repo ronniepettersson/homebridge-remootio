@@ -64,13 +64,15 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.ip_address = config.api_secret_key;
       this.ip_address = config.api_auth_key;
 
-
+      log.info( this.ip_address );
+      log.info( this.api_secret_key );
+      log.info( this.api_auth_key );
 
       device = new RemootioDevice(this.ip_address,
         this.api_secret_key,
         this.api_auth_key);
       this.device = device;
-      log.info( this.ip_address + '/r/n' + this.api_secret_key + '/r/n' + this.api_auth_key);
+
   
       this.garageDoorOpenerService = new api.hap.Service.GarageDoorOpener(this.name);
 
