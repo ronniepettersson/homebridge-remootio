@@ -12,10 +12,11 @@ import {
     Service
   } from "homebridge";
 
-import { RemootioDevice}  from "remootio-api-client";
+import RemootioDevice  = require("remootio-api-client");
 
 
 let hap: HAP;
+let device: RemootioDevice;
 
 export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
@@ -42,9 +43,10 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.ip_address = config.api_secret_key;
       this.ip_address = config.apt_auth_key;
 
-      this.device = new RemootioDevice(this.ip_address,
+      device = new RemootioDevice(this.ip_address,
                                         this.api_secret_key,
                                         this.apt_auth_key);
+      this.device = device;
 
   
       this.garageDoorOpenerService = new hap.Service.GarageDoorOpener(this.name);
@@ -94,14 +96,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage',(frame: any ,payload: any) => this.handleIncomingMessage(payload))
+      this.device.addListener('incomingmessage',(frame: unknown ,payload: unknown) => this.handleIncomingMessage(payload))
 
       this.device.connect(true);
 
       log.info("Remootio Garage Door Opener finished initializing!");
     }
     
-    handleIncomingMessage(decryptedPayload: any) : void {
+    handleIncomingMessage(decryptedPayload: unknown) : void {
       if (decryptedPayload !== undefined){
         //We are interested in events 
         if (decryptedPayload.event && decryptedPayload.event !== undefined){ //It's an event frame containing a log entry from Remootio
