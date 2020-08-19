@@ -2,7 +2,7 @@
 import {
   AccessoryConfig,
   AccessoryPlugin,
-  //    API,
+  API,
   CharacteristicEventTypes,
   CharacteristicGetCallback,
   CharacteristicSetCallback,
@@ -11,6 +11,8 @@ import {
   Logging,
   Service,
 } from 'homebridge';
+
+let hap: HAP;
 
 import RemootioDevice = require('remootio-api-client');
 
@@ -36,7 +38,6 @@ interface RemootioResponse {
 
 type RemootioMessage = RemootioResponse & RemootioEvent;
 
-let hap: HAP;
 let device: RemootioDevice;
 
 export class RemootioHomebridgeAccessory implements AccessoryPlugin {
@@ -50,12 +51,13 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     private apt_auth_key = '';
     private currentDoorState = 0;
     private targetDoorState = 0;
-    private device: RemootioDevice;
+    
+    private readonly device: RemootioDevice;
   
     private readonly garageDoorOpenerService: Service;
     private readonly informationService: Service;
   
-    constructor(log: Logging, config: AccessoryConfig){ //}, api: API) {
+    constructor(log: Logging, config: AccessoryConfig, api: API) {
       
       
       this.log = log;
@@ -70,7 +72,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.device = device;
 
   
-      this.garageDoorOpenerService = new hap.Service.GarageDoorOpener(this.name);
+      this.garageDoorOpenerService = new api.hap.Service.GarageDoorOpener(this.name);
 
 
       
