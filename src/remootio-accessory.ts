@@ -168,12 +168,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this));
   
       this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.TargetDoorState)
-        .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-          // call sendOpen or sendClose
-          this.targetState = value as number;
-          log.info('Target state was set to: ' + (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Close'));
-          callback();
-        });
+        .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
+        
+      //        .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+      // call sendOpen or sendClose
+      //          this.targetState = value as number;
+      //          log.info('Target state was set to: ' + (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Close'));
+      //          callback();
+      //        });
       
       this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.ObstructionDetected)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
@@ -279,8 +281,10 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     }
 
 
-    setTargetStateHandler(callback: CharacteristicSetCallback): void {
-
+    setTargetStateHandler(value: CharacteristicValue, callback: CharacteristicSetCallback): void {
+      // call sendOpen or sendClose
+      this.targetState = value as number;
+      this.log.info('Target state was set to: ' + (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Close'));
       callback(null);
     }
 
