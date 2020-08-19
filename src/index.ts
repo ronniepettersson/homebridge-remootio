@@ -1,14 +1,14 @@
-import { API, HAP } from 'homebridge';
+import { API } from 'homebridge';
 
 import { RemootioHomebridgeAccessory } from './remootio-accessory'; 
 
 
-let hap: HAP;
+
 
 /*
  * Initializer function called when the plugin is loaded.
  */
-export = (api: API) => {
-  hap = api.hap;
+export = (api: API) : void => {
   api.registerAccessory("Remootio", RemootioHomebridgeAccessory);
+
 };

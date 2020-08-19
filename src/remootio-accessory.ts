@@ -2,7 +2,7 @@
 import {
     AccessoryConfig,
     AccessoryPlugin,
-    API,
+//    API,
     CharacteristicEventTypes,
     CharacteristicGetCallback,
     CharacteristicSetCallback,
@@ -33,7 +33,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     private readonly garageDoorOpenerService: Service;
     private readonly informationService: Service;
   
-    constructor(log: Logging, config: AccessoryConfig, api: API) {
+    constructor(log: Logging, config: AccessoryConfig){ //}, api: API) {
       
       
       this.log = log;
@@ -94,18 +94,18 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage',(frame,payload) => this.handleIncomingMessage(frame,payload))
+      this.device.addListener('incomingmessage',(frame: any ,payload: any) => this.handleIncomingMessage(payload))
 
       this.device.connect(true);
 
       log.info("Remootio Garage Door Opener finished initializing!");
     }
     
-    handleIncomingMessage(frame, decryptedPayload) {
-      if (decryptedPayload){
+    handleIncomingMessage(decryptedPayload: any) : void {
+      if (decryptedPayload !== undefined){
         //We are interested in events 
-        if (decryptedPayload.event != undefined){ //It's an event frame containing a log entry from Remootio
-            let rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+        if (decryptedPayload.event && decryptedPayload.event !== undefined){ //It's an event frame containing a log entry from Remootio
+            const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
             this.log.info(rowToLog);
         }
       }
@@ -113,16 +113,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     }
 
 
-    getCurrentStateHandler(callback) {
-          // TODO -> call .sendQuery()  
+    getCurrentStateHandler(callback: CharacteristicGetCallback): void {
+ 
         this.device.sendQuery();
-
-
-          this.log.info("Current state of the Garage Door Opener was returned: " + (this.currentDoorState ? "Closed": "Open"));
-          callback(null, this.currentDoorState);
+        this.log.info("Current state of the Garage Door Opener was returned: " + (this.currentDoorState ? "Closed": "Open"));
+        callback(null, this.currentDoorState);
     }
 
-    setTargetStateHandler(callback) {
+    setTargetStateHandler(callback: CharacteristicSetCallback): void {
 
         callback(null);
     }
