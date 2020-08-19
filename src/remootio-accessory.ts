@@ -44,9 +44,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     private readonly name: string;
     
     // TODO
-    private ip_address = '';
-    private api_secret_key = '';
-    private api_auth_key = '';
+    private readonly ip_address: string;
+    private readonly api_secret_key: string;
+    private readonly api_auth_key: string;
     private currentDoorState = 0;
     private targetDoorState = 0;
     
@@ -61,12 +61,12 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.log = log;
       this.name = config.name;
       this.ip_address = config.ip_address;
-      this.ip_address = config.api_secret_key;
-      this.ip_address = config.api_auth_key;
+      this.api_secret_key = config.api_secret_key;
+      this.api_auth_key = config.api_auth_key;
 
-      log.info( this.ip_address );
-      log.info( this.api_secret_key );
-      log.info( this.api_auth_key );
+      log.info( 'IP: ' + this.ip_address );
+      log.info( 'SK: '+ this.api_secret_key );
+      log.info( 'AK: ' + this.api_auth_key );
 
       device = new RemootioDevice(this.ip_address,
         this.api_secret_key,

@@ -9,7 +9,7 @@
           "title": "Name",
           "type": "string",
           "required": true,
-          "default": "Remootio Dynamic Platform"
+          "default": "Remootio Accessory"
         },
         "ip_address": {
           "title": "IP Address",
