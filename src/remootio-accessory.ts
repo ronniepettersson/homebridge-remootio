@@ -12,8 +12,6 @@ import {
   Service,
 } from 'homebridge';
 
-let hap: HAP;
-
 import RemootioDevice = require('remootio-api-client');
 
 type RemootioEncryptedPayload = {
@@ -181,7 +179,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
           // Dummy return
           log.info('ObstructionDetected was requested' );
-          callback(undefined, false);
+          callback(null, false);
         });   
 
 
@@ -252,7 +250,6 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
           break;
           
       } 
-
     }
 
     getCurrentStateHandler(callback: CharacteristicGetCallback): void {
@@ -270,11 +267,15 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.log.debug('getTargetStateHandler: Target door state: [' + this.targetState + '] ' + 
         (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Closed'));
       if(this.targetState < 0 ) {
-        this.device.sendQuery();
-        callback(new Error('No value available'));
-      } else {
-        callback(null, this.targetState);
-      }
+        if(this.currentState < 0) {
+          callback(new Error('No value available'));
+          return;
+        } else { 
+          this.targetState = this.currentState;
+          this.log.info('Target state is uninitailized, setting target state same as current state');
+        } 
+      } 
+      callback(null, this.targetState);
     }
 
 
