@@ -14,6 +14,27 @@ import {
 
 import RemootioDevice  = require("remootio-api-client");
 
+interface RemootioEvent {
+  event: {
+    cnt: number,
+    type: string,
+    state: string,
+    t100ms: number
+  }
+}
+interface RemootioResponse {
+  response: { 
+    type: string,
+    id: number,
+    success: boolean,
+    state: string,
+    t100ms: number,
+    relayTriggered: boolean,
+    errorCode: string
+  }
+}
+
+type RemootioMessage = RemootioResponse & RemootioEvent;
 
 let hap: HAP;
 let device: RemootioDevice;
@@ -96,17 +117,21 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage',(frame: unknown ,payload: unknown) => this.handleIncomingMessage(payload))
+      this.device.addListener('incomingmessage',(frame: unknown ,payload) => this.handleIncomingMessage(payload))
 
       this.device.connect(true);
 
       log.info("Remootio Garage Door Opener finished initializing!");
     }
     
-    handleIncomingMessage(decryptedPayload: unknown) : void {
-      if (decryptedPayload !== undefined){
+    handleIncomingMessage(decryptedPayload: RemootioMessage  ) : void {
+      if (decryptedPayload !== null ){
         //We are interested in events 
-        if (decryptedPayload.event && decryptedPayload.event !== undefined){ //It's an event frame containing a log entry from Remootio
+        if (decryptedPayload.event ){ //It's an event frame containing a log entry from Remootio
+            const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
+            this.log.info(rowToLog);
+        }
+        if (decryptedPayload.response ){ //It's an event frame containing a log entry from Remootio
             const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
             this.log.info(rowToLog);
         }
