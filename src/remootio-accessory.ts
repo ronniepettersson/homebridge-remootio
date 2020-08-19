@@ -109,14 +109,21 @@ let device: RemootioDevice;
 export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
     private readonly log: Logging;
+    private readonly api: API;
+    private readonly hap;
     private readonly name: string;
     
     // TODO
     private readonly ip_address: string;
     private readonly api_secret_key: string;
     private readonly api_auth_key: string;
-    private currentDoorState = 0;
-    private targetDoorState = 0;
+    private readonly pingInterval = 60000;
+    
+    private readonly currentDoorState;
+    private readonly targetDoorState;
+
+    private currentState = -1; // To detect whether we have recevied an update
+    private targetState = -1;
     
     private readonly device: RemootioDevice;
   
@@ -125,44 +132,48 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
   
     constructor(log: Logging, config: AccessoryConfig, api: API) {
       
-      
+      this.api = api;
+      this.hap = this.api.hap;
       this.log = log;
+      
+      this.currentDoorState = this.hap.Characteristic.CurrentDoorState;
+      this.targetDoorState = this.hap.Characteristic.targetDoorState;
+      
+      // From configuration of this accessory
       this.name = config.name;
       this.ip_address = config.ip_address;
       this.api_secret_key = config.api_secret_key;
       this.api_auth_key = config.api_auth_key;
 
-      log.info( 'IP: ' + this.ip_address );
-      log.info( 'SK: '+ this.api_secret_key );
-      log.info( 'AK: ' + this.api_auth_key );
+
+      log.debug( 'IP: ' + this.ip_address );
+      log.debug( 'SK: '+ this.api_secret_key );
+      log.debug( 'AK: ' + this.api_auth_key );
 
       device = new RemootioDevice(this.ip_address,
         this.api_secret_key,
-        this.api_auth_key);
+        this.api_auth_key,
+        this.pingInterval);
+      
+      
       this.device = device;
 
   
-      this.garageDoorOpenerService = new api.hap.Service.GarageDoorOpener(this.name);
+      this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
 
-
-      
-      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.CurrentDoorState)
+      this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.CurrentDoorState)
         .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
-      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.TargetDoorState)
-        .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-          // TODO -> call .sendQuery() 
-          log.info('Target state of the Garage Door Opener was returned: ' + (this.targetDoorState ? 'Closed': 'Open'));
-          callback(undefined, this.targetDoorState);
-        })          
+      this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.TargetDoorState)
+        .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
         .on(CharacteristicEventTypes.SET, (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
           // call sendOpen or sendClose
-          this.targetDoorState = value as number;
-          log.info('Target state was set to: ' + (this.targetDoorState? 'Close': 'Open'));
+          this.targetState = value as number;
+          log.info('Target state was set to: ' + (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Close'));
           callback();
         });
       
-      this.garageDoorOpenerService.getCharacteristic(api.hap.Characteristic.ObstructionDetected)
+      this.garageDoorOpenerService.getCharacteristic(this.hap.Characteristic.ObstructionDetected)
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
           // Dummy return
           log.info('ObstructionDetected was requested' );
@@ -170,14 +181,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         });   
 
 
-      this.informationService = new api.hap.Service.AccessoryInformation()
-        .setCharacteristic(api.hap.Characteristic.Manufacturer, 'Remootio')
-        .setCharacteristic(api.hap.Characteristic.Model, 'Remootio');
+      this.informationService = new this.hap.Service.AccessoryInformation()
+        .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Remootio')
+        .setCharacteristic(this.hap.Characteristic.Model, 'Remootio');
 
       
-      //this.device.addListener('connecting', ()=>{
-      //  log.info(this.name + ' connecting ...');
-      //});
+      this.device.on('error', (err) => {
+        log.error('whoops! there was an error: ' + err );
+      });
 
       this.device.addListener('connected', ()=>{
         log.info(this.name + ' connected');
@@ -186,11 +197,12 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       
       this.device.addListener('authenticated', ()=>{
         log.info(this.name + ' authenticated');
-        this.device.sendQuery(); 
+        //this.device.sendQuery(); 
       });
 
-      this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => 
-        this.handleIncomingMessage(frame, decryptedPayload));
+      this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => {
+        this.handleIncomingMessage(frame, decryptedPayload);
+      });
 
       this.device.connect(true);
 
@@ -201,6 +213,13 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       if (decryptedPayload !== undefined ){
         const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload) + '\r\n';
         this.log.info(rowToLog);
+
+        if(decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined ) {
+          this.setCurrentDoorState(decryptedPayload.event.state);
+        }
+        if(decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined ) {
+          this.setCurrentDoorState(decryptedPayload.response.state);
+        }
 
       } else { 
         if (frame !== undefined) {
@@ -216,13 +235,44 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
     }
 
+    setCurrentDoorState(state: string) {
+      
+      switch(state) { 
+        case 'open':
+          this.currentState = this.currentDoorState.OPEN;
+          this.log.info('Setting current state to OPEN');
+          break;
+        case 'closed':
+          this.currentState = this.currentDoorState.CLOSED;
+          this.log.info('Setting current state to CLOSED');
+          break;
+          
+      } 
+
+    }
 
     getCurrentStateHandler(callback: CharacteristicGetCallback): void {
- 
-      this.device.sendQuery();
-      this.log.info('Current state of the Garage Door Opener was returned: ' + (this.currentDoorState ? 'Closed': 'Open'));
-      callback(null, this.currentDoorState);
+      this.log.debug('getCurrentStateHandler: Current door state: [' + this.currentState + '] ' + 
+        (this.currentState === this.currentDoorState.OPEN ? 'Open': 'Closed'));
+      if(this.currentState < 0 ) {
+        this.device.sendQuery();
+        callback(new Error('No value available'));
+      } else {
+        callback(null, this.currentState);
+      }
     }
+
+    getTargetStateHandler(callback: CharacteristicGetCallback): void {
+      this.log.debug('getTargetStateHandler: Target door state: [' + this.currentState + '] ' + 
+        (this.targetState === this.targetDoorState.OPEN ? 'Open': 'Closed'));
+      if(this.targetState < 0 ) {
+        this.device.sendQuery();
+        callback(new Error('No value available'));
+      } else {
+        callback(null, this.targetState);
+      }
+    }
+
 
     setTargetStateHandler(callback: CharacteristicSetCallback): void {
 
