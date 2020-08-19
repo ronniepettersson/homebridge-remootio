@@ -46,7 +46,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     // TODO
     private ip_address = '';
     private api_secret_key = '';
-    private apt_auth_key = '';
+    private api_auth_key = '';
     private currentDoorState = 0;
     private targetDoorState = 0;
     
@@ -62,13 +62,15 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.name = config.name;
       this.ip_address = config.ip_address;
       this.ip_address = config.api_secret_key;
-      this.ip_address = config.apt_auth_key;
+      this.ip_address = config.api_auth_key;
+
+
 
       device = new RemootioDevice(this.ip_address,
         this.api_secret_key,
-        this.apt_auth_key);
+        this.api_auth_key);
       this.device = device;
-
+      log.info( this.ip_address + '/r/n' + this.api_secret_key + '/r/n' + this.api_auth_key);
   
       this.garageDoorOpenerService = new api.hap.Service.GarageDoorOpener(this.name);
 
@@ -103,9 +105,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         .setCharacteristic(api.hap.Characteristic.Model, 'Remootio');
 
       
-      this.device.addListener('connecting', ()=>{
-        log.info(this.name + ' connecting ...');
-      });
+      //this.device.addListener('connecting', ()=>{
+      //  log.info(this.name + ' connecting ...');
+      //});
 
       this.device.addListener('connected', ()=>{
         log.info(this.name + ' connected');
@@ -113,7 +115,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       });
       
       this.device.addListener('authenticated', ()=>{
-        log.info(this.name + ' conneauthenticated');
+        log.info(this.name + ' authenticated');
         this.device.sendQuery(); 
       });
 
