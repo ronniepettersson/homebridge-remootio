@@ -282,16 +282,20 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
 
     setTargetStateHandler(value: CharacteristicValue, callback: CharacteristicSetCallback): void {
-      // call sendOpen or sendClose
+      // call sendOpen or sendClose based on value
       const targetValue = value as number;
       if( targetValue === this.targetState) {
-        this.log.debug('setTargetStateHandler: New value same as previous value ' +
-        + (targetValue === this.targetDoorState.OPEN ? 'Open': 'Close' ));        
+        this.log.info('setTargetStateHandler: New value same as previous value ' +
+          (targetValue === this.targetDoorState.OPEN ? 'Open': 'Close' ));        
       } else {
-        this.log.debug('setTargetStateHandler: ' + (targetValue === this.targetDoorState.OPEN ? 'Open': 'Close' ));
+        
+        this.log.info('setTargetStateHandler: New value: [' + targetValue + '] Old value [' + this.targetState + ']');
+        this.targetState = targetValue;
         if(targetValue === this.targetDoorState.OPEN) {
+          this.log.info('sendOpen()');
           this.device.sendOpen();
         } else if(targetValue === this.targetDoorState.CLOSED) {
+          this.log.info('sendClose()');
           this.device.sendClose();
         }
       }

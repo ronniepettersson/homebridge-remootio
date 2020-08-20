@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Homebridge plugin for Remootio",
   "main": "dist/index.js",
+  "private": true,
   "scripts": {
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
