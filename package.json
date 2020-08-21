@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Homebridge plugin for Remootio",
   "main": "dist/index.js",
   "private": true,
@@ -12,6 +12,7 @@
   },
   "keywords": [
     "homebridge-plugin",
+    "homebridge-remootio",
     "Remootio"
   ],
   "engines": {
