@@ -112,7 +112,7 @@ type RemootioDecryptedPayload =
   RemootioLeftOpen & 
   RemootioResponse;
 
-
+let device: RemootioDevice;
 
 export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
@@ -154,6 +154,11 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.api_secret_key = config.api_secret_key;
       this.api_auth_key = config.api_auth_key;
 
+
+      log.debug( 'IP: ' + this.ip_address );
+      log.debug( 'SK: '+ this.api_secret_key );
+      log.debug( 'AK: ' + this.api_auth_key );
+
       // If we don't have all the required configuration parameters, don't continue
       if( this.ip_address === undefined || this.api_secret_key === undefined || this.api_auth_key === undefined){
         log.warn('Missing required config parameters, exiting');
@@ -161,11 +166,14 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       }
 
       // Add a new Remootio device using remootio-api-client library
-      this.device = new RemootioDevice(this.ip_address,
+      device = new RemootioDevice(
+        this.ip_address,
         this.api_secret_key,
         this.api_auth_key,
-        this.pingInterval);
-      
+        this.pingInterval,
+      );
+      this.device = device;
+
       // Creating new Garage door opener service
       this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
 
