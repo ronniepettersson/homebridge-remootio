@@ -1,5 +1,5 @@
 {
-    "pluginAlias": "homebridge-remootio",
+    "pluginAlias": "Remootio",
     "pluginType": "accessory",
     "singular": false,
     "schema": {
