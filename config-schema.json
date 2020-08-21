@@ -1,5 +1,5 @@
 {
-    "pluginAlias": "RemootioHomebridgePlugin",
+    "pluginAlias": "homebridge-remootio",
     "pluginType": "accessory",
     "singular": false,
     "schema": {
@@ -13,18 +13,21 @@
         },
         "ip_address": {
           "title": "IP Address",
+          "description": "The device's IP address. It is recommended to set a static IP for the device.",
           "type": "string",
           "required": true,
           "default": "xxx.xxx.xxx.xxx"
         },
         "api_secret_key": {
           "title": "API Secret Key",
+          "description": "The device's API Secret Key ",
           "type": "string",
           "required": true,
           "default": "API Secret Key from App"
         },
         "api_auth_key": {
           "title": "API Authentication Key",
+          "description": "The device's API Authentication Key ",
           "type": "string",
           "required": true,
           "default": "API Authentication Key from App"

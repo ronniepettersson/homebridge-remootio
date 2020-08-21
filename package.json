@@ -10,14 +10,9 @@
     "build": "rm -rf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build"
   },
-  "files": [
-    "LICENSE",
-    "README.md",
-    "config.schema.json",
-    "dist"
-  ],
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "Remootio",
   ],
   "engines": {
     "homebridge": ">=1.0.0"
