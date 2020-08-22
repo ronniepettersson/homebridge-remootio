@@ -29,9 +29,9 @@ If you chose to configure the plugin manually, you will need to add a section in
 "accessories": [
     {
         "name": "<name of the device you want to appear in HomeKit>",
-        "ip_address": "<the ip address of your Remootio device>",
-        "api_secret_key": "<API Secret Key>",
-        "api_auth_key": "<API Authorization Key>",
+        "ipAddress": "<the ip address of your Remootio device>",
+        "apiSecretKey": "<API Secret Key>",
+        "apiAuthKey": "<API Authorization Key>",
         "accessory": "Remootio"
     }
 ]
