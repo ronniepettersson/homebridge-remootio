@@ -4,7 +4,7 @@
 
 ## Limitations
 
-This plugin is still under development. It is currently limited to `Remootio 1` with `Gate status sensor` installed. When restarting the module, the device may not retain the configured room in Apple Home.
+This plugin is still under development. It is currently limited to `Remootio 1` with `Gate status sensor` installed. When restarting the plugin, the device may not retain the configured room in Apple Home.
 
 ## Installation
 
