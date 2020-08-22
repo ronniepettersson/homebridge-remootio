@@ -32,6 +32,9 @@
     "type": "git",
     "url": "git+https://github.com/ronniepettersson/homebridge-remootio.git"
   },
+  "publishConfig": {
+    "registry":"https://registry.npmjs.org/"
+  },
   "author": "Ronnie Pettersson",
   "license": "Apache-2.0",
   "bugs": {
