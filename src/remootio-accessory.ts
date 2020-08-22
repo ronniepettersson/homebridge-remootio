@@ -14,7 +14,7 @@ import {
   CharacteristicSetCallback,
   CharacteristicValue,
   Logging,
-  Service,
+  Service
 } from 'homebridge';
 
 import RemootioDevice = require('remootio-api-client');
@@ -122,9 +122,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     private readonly name: string;
     
     // TODO
-    private readonly ip_address: string;
-    private readonly api_secret_key: string;
-    private readonly api_auth_key: string;
+    private readonly ipAddress: string;
+    private readonly apiSecretKey: string;
+    private readonly apiAuthKey: string;
     private readonly pingInterval = 60000;
     
     private readonly currentDoorState;
@@ -135,8 +135,8 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     
     private readonly device: RemootioDevice;
   
-    private readonly garageDoorOpenerService;
-    private readonly informationService;
+    private readonly garageDoorOpenerService!: Service;
+    private readonly informationService!: Service;
   
     // The constructor initializes variables 
     constructor(log: Logging, config: AccessoryConfig, api: API) {
@@ -150,26 +150,26 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       
       // From configuration of this accessory
       this.name = config.name;
-      this.ip_address = config.ip_address;
-      this.api_secret_key = config.api_secret_key;
-      this.api_auth_key = config.api_auth_key;
+      this.ipAddress = config.ipAddress;
+      this.apiSecretKey = config.apiSecretKey;
+      this.apiAuthKey = config.apiAuthKey;
 
 
-      log.debug( 'IP: ' + this.ip_address );
-      log.debug( 'SK: '+ this.api_secret_key );
-      log.debug( 'AK: ' + this.api_auth_key );
+      log.debug( 'IP: ' + this.ipAddress );
+      log.debug( 'SK: '+ this.apiSecretKey );
+      log.debug( 'AK: ' + this.apiAuthKey );
 
       // If we don't have all the required configuration parameters, don't continue
-      if( this.ip_address === undefined || this.api_secret_key === undefined || this.api_auth_key === undefined){
+      if( this.ipAddress === undefined || this.apiSecretKey === undefined || this.apiAuthKey === undefined){
         log.warn('Missing required config parameters, exiting');
         return;
       }
 
       // Add a new Remootio device using remootio-api-client library
       device = new RemootioDevice(
-        this.ip_address,
-        this.api_secret_key,
-        this.api_auth_key,
+        this.ipAddress,
+        this.apiSecretKey,
+        this.apiAuthKey,
         this.pingInterval,
       );
       this.device = device;
