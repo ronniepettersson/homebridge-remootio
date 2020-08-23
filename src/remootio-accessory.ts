@@ -100,6 +100,8 @@ type RemootioDecryptedPayload = RemootioStateChangeEvent & RemootioTriggeredEven
 
 let device: RemootioDevice;
 
+const garageDoorOpenerStateToString: string[] = ['OPEN', 'CLOSED', 'OPENING', 'CLOSING', 'STOPPED'];
+
 export class RemootioHomebridgeAccessory implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly api: API;
@@ -236,10 +238,16 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       case 'open':
         this.currentState = this.currentDoorState.OPEN;
         this.log.info('Setting current state to OPEN');
+        this.garageDoorOpenerService!.getCharacteristic(this.hap.Characteristic.CurrentDoorState)!.updateValue(
+          this.currentDoorState.OPEN,
+        );
         break;
       case 'closed':
         this.currentState = this.currentDoorState.CLOSED;
         this.log.info('Setting current state to CLOSED');
+        this.garageDoorOpenerService!.getCharacteristic(this.hap.Characteristic.CurrentDoorState)!.updateValue(
+          this.currentDoorState.CLOSED,
+        );
         break;
     }
   }
@@ -252,11 +260,13 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         (this.currentState === this.currentDoorState.OPEN ? 'Open' : 'Closed'),
     );
     if (this.currentState < 0) {
-      this.device.sendQuery();
       callback(new Error('No value available'));
     } else {
+      // Always return current state, so that the server does not emit an event to HAP
       callback(null, this.currentState);
     }
+    // Always send a query request to the garage door opener. When the request returned, send the event via setCurrentDoorState()
+    this.device.sendQuery();
   }
 
   getTargetStateHandler(callback: CharacteristicGetCallback): void {
@@ -282,28 +292,30 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
    * This method implements the logic for sending open or close to the devices.
    * In current implementation, it will not resend a command if the target door state is the same as previous call.
    */
-  setTargetStateHandler(value: CharacteristicValue, callback: CharacteristicSetCallback): void {
+  setTargetStateHandler(newValue: CharacteristicValue, callback: CharacteristicSetCallback): void {
     // call sendOpen or sendClose based on value
-    const targetValue = value as number;
-    if (targetValue === this.targetDoorState.OPEN) {
-      this.log.info('requesting sendOpen()');
-    } else if (targetValue === this.targetDoorState.CLOSED) {
-      this.log.info('requesting sendClose()');
-    }
 
-    if (targetValue === this.targetState) {
-      this.log.info(
-        'setTargetStateHandler: New value same as previous value ' +
-          (targetValue === this.targetDoorState.OPEN ? 'Open' : 'Close'),
-      );
-    } else {
-      this.log.info('setTargetStateHandler: New value: [' + targetValue + '] Old value [' + this.targetState + ']');
-      this.targetState = targetValue;
-      if (targetValue === this.targetDoorState.OPEN) {
-        this.log.info('sendOpen()');
+    if (newValue === undefined || newValue === null) {
+      this.log.debug('setTargetStateHandler: invalid newValue');
+      callback(new Error('no value'));
+      return;
+    }
+    const oldState = this.targetState;
+    const newState = newValue as number;
+
+    this.log.info(
+      'setTargetStateHandler: New value: ' +
+        garageDoorOpenerStateToString[newState] +
+        ' Old value [' +
+        garageDoorOpenerStateToString[oldState],
+    );
+    if (newState !== oldState) {
+      this.targetState = newState;
+      if (newState === this.targetDoorState.OPEN) {
+        this.log.info('Sending sendOpen()');
         this.device.sendOpen();
-      } else if (targetValue === this.targetDoorState.CLOSED) {
-        this.log.info('sendClose()');
+      } else if (newState === this.targetDoorState.CLOSED) {
+        this.log.info('Sending sendClose()');
         this.device.sendClose();
       }
     }
