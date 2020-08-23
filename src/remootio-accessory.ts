@@ -15,6 +15,7 @@ import {
   CharacteristicValue,
   Logging,
   Service,
+  Characteristic,
 } from 'homebridge';
 
 import RemootioDevice = require('remootio-api-client');
@@ -114,8 +115,8 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
   private readonly apiAuthKey: string;
   private readonly pingInterval = 60000;
 
-  private readonly currentDoorState;
-  private readonly targetDoorState;
+  private readonly currentDoorState: typeof Characteristic.CurrentDoorState;
+  private readonly targetDoorState: typeof Characteristic.TargetDoorState;
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
@@ -174,8 +175,8 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     this.garageDoorOpenerService
       .getCharacteristic(this.hap.Characteristic.ObstructionDetected)
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-        // Dummy return
-        log.info('ObstructionDetected was requested');
+        // Dummy return as this is not supported by Remootio devices at this point
+        log.debug('ObstructionDetected was requested');
         callback(null, false);
       });
 
@@ -196,6 +197,11 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
     this.device.addListener('authenticated', () => {
       log.info(this.name + ' authenticated');
+      //this.device.sendQuery();
+    });
+    
+    this.device.addListener('disconnect', (msg: string) => {
+      log.info(this.name + msg);
       //this.device.sendQuery();
     });
 
@@ -310,6 +316,11 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         garageDoorOpenerStateToString[oldState],
     );
     if (newState !== oldState) {
+      if (!this.device.isConnected() || !this.device.isAuthenticated()) {
+        this.log.info('Device is not connected');
+        callback(new Error('Not Connected'));
+        return;
+      }
       this.targetState = newState;
       if (newState === this.targetDoorState.OPEN) {
         this.log.info('Sending sendOpen()');
