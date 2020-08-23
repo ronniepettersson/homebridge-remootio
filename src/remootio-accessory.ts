@@ -252,8 +252,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
         const rowToLog = new Date().toISOString() + decryptedPayload.response.type;
         this.log.info(rowToLog);
-        //if (decryptedPayload.response.type === 'CLOSE') {}
-        //this.setCurrentDoorState(decryptedPayload.response.state);
+        if (decryptedPayload.response.type === 'QUERY') {
+          this.setCurrentDoorState(decryptedPayload.response.state);
+        }
       }
     } else {
       if (frame !== undefined) {
