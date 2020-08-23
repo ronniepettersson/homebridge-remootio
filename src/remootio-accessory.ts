@@ -49,14 +49,30 @@ interface RemootioChallenge {
   };
 }
 
-interface RemootioStateChangeEvent {
+interface RemootioEvent {
   event: {
     cnt: number;
     type: string;
     state: string;
     t100ms: number;
+    data?: {
+      keyNr?: number;
+      keyType?: string;
+      via?: string;
+      imeOpen100ms?: number;
+    };
   };
 }
+/*
+interface RemootioStateChangeEvent {
+  event: {
+    cnt: number;
+    type: 'StateChange';
+    state: string;
+    t100ms: number;
+  };
+}
+
 interface RemootioTriggeredEvent {
   event: {
     cnt: number;
@@ -81,6 +97,7 @@ interface RemootioLeftOpen {
     };
   };
 }
+*/
 interface RemootioResponse {
   response: {
     type: string;
@@ -97,7 +114,8 @@ type RemootioTypedFrame = RemootioEncryptedPayload | RemootioError | RemootioPin
 
 type RemootioFrame = RemootioTypedFrame & RemootioChallenge;
 
-type RemootioDecryptedPayload = RemootioStateChangeEvent & RemootioTriggeredEvent & RemootioLeftOpen & RemootioResponse;
+//type RemootioDecryptedPayload = RemootioStateChangeEvent & RemootioTriggeredEvent & RemootioLeftOpen & RemootioResponse;
+type RemootioDecryptedPayload = RemootioEvent & RemootioResponse;
 
 let device: RemootioDevice;
 
@@ -199,9 +217,9 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       log.info(this.name + ' authenticated');
       //this.device.sendQuery();
     });
-    
+
     this.device.addListener('disconnect', (msg: string) => {
-      log.info(this.name + msg);
+      log.info(this.name + ' ' + msg);
       //this.device.sendQuery();
     });
 
@@ -221,10 +239,21 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.log.debug(rowToLog);
 
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
-        this.setCurrentDoorState(decryptedPayload.event.state);
+        if (decryptedPayload.event.type === 'StateChange') {
+          this.setCurrentDoorState(decryptedPayload.event.state);
+        }
+        if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.state === 'open') {
+          this.setCurrentDoorState('closing');
+        }
+        if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.state === 'closed') {
+          this.setCurrentDoorState('opening');
+        }
       }
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
-        this.setCurrentDoorState(decryptedPayload.response.state);
+        const rowToLog = new Date().toISOString() + decryptedPayload.response.type;
+        this.log.info(rowToLog);
+        //if (decryptedPayload.response.type === 'CLOSE') {}
+        //this.setCurrentDoorState(decryptedPayload.response.state);
       }
     } else {
       if (frame !== undefined) {
@@ -253,6 +282,20 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         this.log.info('Setting current state to CLOSED');
         this.garageDoorOpenerService!.getCharacteristic(this.hap.Characteristic.CurrentDoorState)!.updateValue(
           this.currentDoorState.CLOSED,
+        );
+        break;
+      case 'opening':
+        this.currentState = this.currentDoorState.OPENING;
+        this.log.info('Setting current state to OPENING');
+        this.garageDoorOpenerService!.getCharacteristic(this.hap.Characteristic.CurrentDoorState)!.updateValue(
+          this.currentDoorState.OPENING,
+        );
+        break;
+      case 'closing':
+        this.currentState = this.currentDoorState.CLOSING;
+        this.log.info('Setting current state to CLOSING');
+        this.garageDoorOpenerService!.getCharacteristic(this.hap.Characteristic.CurrentDoorState)!.updateValue(
+          this.currentDoorState.CLOSING,
         );
         break;
     }
@@ -312,7 +355,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     this.log.info(
       'setTargetStateHandler: New value: ' +
         garageDoorOpenerStateToString[newState] +
-        ' Old value [' +
+        ' Old value: ' +
         garageDoorOpenerStateToString[oldState],
     );
     if (newState !== oldState) {
