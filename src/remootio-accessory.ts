@@ -316,7 +316,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         garageDoorOpenerStateToString[oldState],
     );
     if (newState !== oldState) {
-      if (!this.device.isConnected() || !this.device.isAuthenticated()) {
+      if (!this.device.isConnected || !this.device.isAuthenticated) {
         this.log.info('Device is not connected');
         callback(new Error('Not Connected'));
         return;
