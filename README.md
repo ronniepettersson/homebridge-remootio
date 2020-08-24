@@ -1,5 +1,5 @@
 <span align="center">
-<img src="./assets/REMOOTIO_LOGO_x40.png">
+<img src="./assets/REMOOTIO__LOGO_x40.png" >
 </span>
 
 # Homebridge Remootio
