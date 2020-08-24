@@ -1,6 +1,6 @@
-<span align="center">
-<img src="./assets/REMOOTIO__LOGO_x40.png" >
-</span>
+<p align="center">
+<a href="https://www.remootio.com/"><img src="./assets/REMOOTIO__LOGO_x40.png" ></a>
+</p>
 
 # Homebridge Remootio
 
