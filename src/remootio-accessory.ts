@@ -239,7 +239,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
   handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload): void {
     if (decryptedPayload !== undefined) {
-      const rowToLog = new Date().toISOString() + 'Incoming: ' + JSON.stringify(decryptedPayload);
+      const rowToLog = new Date().toISOString() + ' Incoming: ' + JSON.stringify(decryptedPayload);
       this.log.debug(rowToLog);
 
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
@@ -366,8 +366,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     if (newState !== oldState) {
       if (!this.device.isConnected || !this.device.isAuthenticated) {
         this.log.info('Device is not connected');
-        callback(new Error('Not Connected'));
-        return;
+        return callback(new Error('Not Connected'));
       }
       this.targetState = newState;
       if (newState === this.targetDoorState.OPEN) {
