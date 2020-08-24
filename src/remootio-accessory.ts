@@ -227,7 +227,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
       this.handleIncomingMessage(frame, decryptedPayload);
     });
     this.device.addListener('outgoingmessage', (frame: RemootioTypedFrame) => {
-      const rowToLog = new Date().toISOString() + 'Outgoing: ' + JSON.stringify(frame);
+      const rowToLog = new Date().toISOString() + ' Outgoing: ' + JSON.stringify(frame);
       this.log.debug(rowToLog);
     });
 
@@ -263,7 +263,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     } else {
       if (frame !== undefined) {
         if (frame.challenge === undefined && frame.type !== undefined) {
-          const rowToLog = new Date().toISOString() + 'Incoming: ' + frame.type;
+          const rowToLog = new Date().toISOString() + ' Incoming: ' + frame.type;
           this.log.debug(rowToLog);
         } else if (frame.challenge !== undefined) {
           const rowToLog = new Date().toISOString() + ' Challenge';
