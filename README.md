@@ -1,5 +1,5 @@
 <p align="center">
-<a href="https://www.remootio.com/"><img src="./assets/REMOOTIO__LOGO_x40.png" ></a>
+<a href="https://www.remootio.com/"><img src="https://raw.githubusercontent.com/ronniepettersson/homebridge-remootio/master/assets/REMOOTIO__LOGO_x40.png" ></a>
 </p>
 
 # Homebridge Remootio
@@ -8,7 +8,7 @@
 
 ## Limitations
 
-This plugin is still under development. It is currently limited to `Remootio 1` with `Gate status sensor` installed. When restarting the plugin, the device may not retain the configured room in Apple Home.
+This plugin is still under development. It is currently limited to [Remootio 1](https://www.remootio.com/products/remootio) with `Gate status sensor` installed. When restarting the plugin, the device may not retain the configured room in Apple Home.
 
 ## Installation
 

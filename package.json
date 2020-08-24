@@ -18,8 +18,7 @@
   "files": [
     "LICENSE",
     "dist",
-    "config.schema.json",
-    "assets/*.*"
+    "config.schema.json"
   ],
   "keywords": [
     "homebridge-plugin",
