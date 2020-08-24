@@ -1,3 +1,7 @@
+<span align="center">
+<img src="./assets/REMOOTIO_LOGO_x40.png">
+</span>
+
 # Homebridge Remootio
 
 [Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support.
