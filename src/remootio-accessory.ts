@@ -226,6 +226,10 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => {
       this.handleIncomingMessage(frame, decryptedPayload);
     });
+    this.device.addListener('outgoingmessage', (frame: RemootioTypedFrame) => {
+      const rowToLog = new Date().toISOString() + 'Outgoing: ' + JSON.stringify(frame);
+      this.log.debug(rowToLog);
+    });
 
     // Request to connect with Remootio device with auto-reconnect = true
     this.device.connect(true);
@@ -235,7 +239,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
 
   handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload): void {
     if (decryptedPayload !== undefined) {
-      const rowToLog = new Date().toISOString() + ' ' + JSON.stringify(decryptedPayload);
+      const rowToLog = new Date().toISOString() + 'Incoming: ' + JSON.stringify(decryptedPayload);
       this.log.debug(rowToLog);
 
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
@@ -250,7 +254,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
         }
       }
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
-        const rowToLog = new Date().toISOString() + decryptedPayload.response.type;
+        const rowToLog = new Date().toISOString() + ' ' + decryptedPayload.response.type;
         this.log.info(rowToLog);
         if (decryptedPayload.response.type === 'QUERY') {
           this.setCurrentDoorState(decryptedPayload.response.state);
@@ -259,7 +263,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     } else {
       if (frame !== undefined) {
         if (frame.challenge === undefined && frame.type !== undefined) {
-          const rowToLog = new Date().toISOString() + ' ' + frame.type;
+          const rowToLog = new Date().toISOString() + 'Incoming: ' + frame.type;
           this.log.debug(rowToLog);
         } else if (frame.challenge !== undefined) {
           const rowToLog = new Date().toISOString() + ' Challenge';
