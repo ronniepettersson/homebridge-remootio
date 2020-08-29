@@ -151,7 +151,12 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     this.log = log;
 
     // If we don't have all the required configuration parameters, don't continue
-    if (!config || this.ipAddress === undefined || this.apiSecretKey === undefined || this.apiAuthKey === undefined) {
+    if (
+      config === undefined ||
+      config.ipAddress === undefined ||
+      config.apiSecretKey === undefined ||
+      config.apiAuthKey === undefined
+    ) {
       log.error('Missing required config parameters, exiting');
       return;
     }
