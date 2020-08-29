@@ -1,10 +1,9 @@
 import { API } from 'homebridge';
 
-import { RemootioHomebridgeAccessory } from './remootio-accessory';
+import { PLUGIN_NAME, PLATFORM_NAME } from './settings';
 
-/*
- * Initializer function called when the plugin is loaded.
- */
-export = (api: API): void => {
-  api.registerAccessory('Remootio', RemootioHomebridgeAccessory);
+import { RemootioPlatform } from './platform';
+
+export = (api: API) => {
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, RemootioPlatform);
 };
