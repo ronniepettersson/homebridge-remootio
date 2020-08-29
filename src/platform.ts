@@ -36,6 +36,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
     this.config = config;
 
     Accessory = api.platformAccessory;
+    hap = api.hap;
 
     // Parse config here
 
@@ -95,7 +96,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
       const rowToLog = new Date().toISOString() + ' devices: ' + JSON.stringify(device);
       this.log.debug(rowToLog);
       // Generate this device's unique identifier.
-      
+
       const uuid = hap.uuid.generate(device.apiAuthKey);
 
       let accessory: PlatformAccessory;
