@@ -93,8 +93,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
         continue;
       }
 
-      const rowToLog = new Date().toISOString() + ' devices: ' + JSON.stringify(device);
-      this.log.debug(rowToLog);
+      
       // Generate this device's unique identifier.
 
       const uuid = hap.uuid.generate(device.apiAuthKey);
@@ -124,8 +123,11 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
         this.api.updatePlatformAccessories([accessory]);
       }
     }
+    const rowToLog = 'configuredAccessories: ' + JSON.stringify(this.configuredAccessories);
+    this.log.debug(rowToLog);
 
     // Remove devices that are no longer found in the configuration, but we still have in HomeKit.
+    /*
     for (const oldAccessory of this.accessories) {
       this.log('%s: Removing Remootio device from HomeKit.', oldAccessory.displayName);
 
@@ -133,7 +135,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
       this.accessories.splice(this.accessories.indexOf(oldAccessory), 1);
       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [oldAccessory]);
     }
-
+    */
     return true;
   }
 
