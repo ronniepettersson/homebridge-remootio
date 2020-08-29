@@ -117,7 +117,7 @@ type RemootioFrame = RemootioTypedFrame & RemootioChallenge;
 //type RemootioDecryptedPayload = RemootioStateChangeEvent & RemootioTriggeredEvent & RemootioLeftOpen & RemootioResponse;
 type RemootioDecryptedPayload = RemootioEvent & RemootioResponse;
 
-let device: RemootioDevice;
+//let device: RemootioDevice;
 
 const garageDoorOpenerStateToString: string[] = ['OPEN', 'CLOSED', 'OPENING', 'CLOSING', 'STOPPED'];
 
@@ -125,21 +125,21 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly api: API;
   private readonly hap: HAP;
-  private readonly name: string;
 
-  // TODO
-  private readonly ipAddress: string;
-  private readonly apiSecretKey: string;
-  private readonly apiAuthKey: string;
+  // Configuration parameters
+  private readonly name!: string;
+  private readonly ipAddress!: string;
+  private readonly apiSecretKey!: string;
+  private readonly apiAuthKey!: string;
   private readonly pingInterval = 60000;
 
-  private readonly currentDoorState: typeof Characteristic.CurrentDoorState;
-  private readonly targetDoorState: typeof Characteristic.TargetDoorState;
+  private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
+  private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
 
-  private readonly device: RemootioDevice;
+  private readonly device!: RemootioDevice;
 
   private readonly garageDoorOpenerService!: Service;
   private readonly informationService!: Service;
@@ -147,14 +147,20 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
   // The constructor initializes variables
   constructor(log: Logging, config: AccessoryConfig, api: API) {
     this.api = api;
-    this.hap = this.api.hap;
+    this.hap = api.hap;
     this.log = log;
+
+    // If we don't have all the required configuration parameters, don't continue
+    if (!config || this.ipAddress === undefined || this.apiSecretKey === undefined || this.apiAuthKey === undefined) {
+      log.error('Missing required config parameters, exiting');
+      return;
+    }
 
     this.currentDoorState = this.hap.Characteristic.CurrentDoorState;
     this.targetDoorState = this.hap.Characteristic.TargetDoorState;
 
     // From configuration of this accessory
-    this.name = config.name;
+    this.name = config.name || 'Remootio Device';
     this.ipAddress = config.ipAddress;
     this.apiSecretKey = config.apiSecretKey;
     this.apiAuthKey = config.apiAuthKey;
@@ -163,15 +169,8 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     log.debug('SK: ' + this.apiSecretKey);
     log.debug('AK: ' + this.apiAuthKey);
 
-    // If we don't have all the required configuration parameters, don't continue
-    if (this.ipAddress === undefined || this.apiSecretKey === undefined || this.apiAuthKey === undefined) {
-      log.warn('Missing required config parameters, exiting');
-      return;
-    }
-
     // Add a new Remootio device using remootio-api-client library
-    device = new RemootioDevice(this.ipAddress, this.apiSecretKey, this.apiAuthKey, this.pingInterval);
-    this.device = device;
+    this.device = new RemootioDevice(this.ipAddress, this.apiSecretKey, this.apiAuthKey, this.pingInterval);
 
     // Creating new Garage door opener service
     this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
@@ -365,7 +364,7 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     );
     if (newState !== oldState) {
       if (!this.device.isConnected || !this.device.isAuthenticated) {
-        this.log.info('Device is not connected');
+        this.log.warn('Device is not connected');
         return callback(new Error('Not Connected'));
       }
       this.targetState = newState;
@@ -381,13 +380,6 @@ export class RemootioHomebridgeAccessory implements AccessoryPlugin {
     callback(null);
   }
 
-  /*
-   * This method is optional to implement. It is called when HomeKit ask to identify the accessory.
-   * Typical this only ever happens at the pairing process.
-   */
-  identify(): void {
-    this.log('Identify!');
-  }
 
   /*
    * This method is called directly after creation of this instance.

@@ -7,11 +7,11 @@
 [Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support.
 
 ## Usage
-First of all make sure that the Remootio Websocket API is enabled for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these.
+First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. Install the `Gate status sensor` and enable it in the app.
 
 ## Limitations
 
-This plugin is still under development. It is currently limited to [Remootio 1](https://www.remootio.com/products/remootio) with `Gate status sensor` installed. When restarting the plugin, the device may not retain the configured room in Apple Home.
+This plugin is still under development. It supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version 2.20, as long as the `Gate status sensor` is installed and enabled. When restarting the plugin, the device may not retain the configured room in Apple Home.
 
 ## Installation
 

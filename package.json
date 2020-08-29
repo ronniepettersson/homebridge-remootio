@@ -1,9 +1,8 @@
 {
   "name": "homebridge-remootio",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Homebridge plugin for Remootio",
   "main": "dist/index.js",
- 
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "clean": "rimraf ./dist",
@@ -35,7 +34,7 @@
     "url": "git+https://github.com/ronniepettersson/homebridge-remootio.git"
   },
   "publishConfig": {
-    "registry":"https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/"
   },
   "author": "Ronnie Pettersson",
   "license": "Apache-2.0",
