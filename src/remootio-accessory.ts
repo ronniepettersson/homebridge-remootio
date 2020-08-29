@@ -153,14 +153,20 @@ export class RemootioHomebridgeAccessory {
     this.device = new RemootioDevice(this.ipAddress, this.apiSecretKey, this.apiAuthKey, this.pingInterval);
 
     // Creating new Garage door opener service
-    const garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
+    const garageDoorService = accessory.getService(this.hap.Service.GarageDoorOpener);
 
-    accessory.addService(garageDoorOpenerService);
+    // Clear out stale services.
+    if (garageDoorService) {
+      accessory.removeService(garageDoorService);
+    }
+
+    // Add the garage door opener service to the accessory.
+    const garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
 
     // Registering the listeners for the required characteristics
     // https://developers.homebridge.io/#/service/GarageDoorOpener
     accessory
-      .getService(this.hap.Service.GarageDoorOpener)!
+      .addService(garageDoorOpenerService)
       .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
       .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
