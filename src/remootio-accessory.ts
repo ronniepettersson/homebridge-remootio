@@ -12,7 +12,6 @@ import {
   CharacteristicSetCallback,
   CharacteristicValue,
   Logging,
-  Service,
   Characteristic,
   PlatformAccessory,
 } from 'homebridge';

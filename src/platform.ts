@@ -2,9 +2,6 @@
 import {
   API,
   APIEvent,
-  CharacteristicEventTypes,
-  CharacteristicSetCallback,
-  CharacteristicValue,
   DynamicPlatformPlugin,
   HAP,
   Logging,
