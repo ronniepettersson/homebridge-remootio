@@ -66,7 +66,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
     accessory.on(PlatformAccessoryEvent.IDENTIFY, () => {
       this.log('%s identified!', accessory.displayName);
     });
-
+    accessory.context.device = null;
     this.accessories.push(accessory);
   }
 
@@ -85,7 +85,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
       }
     }
 
-    // Iterate through the list of devices that myQ has returned and sync them with what we show HomeKit.
+    // Iterate through the list of devices in configuration and sync them with what we show HomeKit.
     for (const device of this.config.devices) {
       // If we have no IP address or authentication key, something is wrong.
       if (!device.ipAddress || !device.apiAuthKey) {
@@ -124,11 +124,13 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
 
     // Remove devices that are no longer found in the configuration, but we still have in HomeKit.
     for (const oldAccessory of this.accessories) {
-      this.log('%s: Removing Remootio device from HomeKit.', oldAccessory.displayName);
+      if (!oldAccessory.context.device){
+        this.log('%s: Removing Remootio device from HomeKit.', oldAccessory.displayName);
 
-      delete this.configuredAccessories[oldAccessory.UUID];
-      this.accessories.splice(this.accessories.indexOf(oldAccessory), 1);
-      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [oldAccessory]);
+        delete this.configuredAccessories[oldAccessory.UUID];
+        this.accessories.splice(this.accessories.indexOf(oldAccessory), 1);
+        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [oldAccessory]);
+      }
     }
 
     return true;
