@@ -184,7 +184,7 @@ export class RemootioHomebridgeAccessory {
       .getCharacteristic(this.hap.Characteristic.ObstructionDetected)!
       .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
         // Dummy return as this is not supported by Remootio devices at this point
-        this.log.debug('ObstructionDetected was requested');
+        this.log.debug('[%s] ObstructionDetected was requested', this.name);
         callback(null, false);
       });
 
@@ -197,7 +197,7 @@ export class RemootioHomebridgeAccessory {
     // Registering the listeners for the Remootio API client
     // https://documents.remootio.com/docs/WebsocketApiDocs.pdf
     this.device.on('error', (err) => {
-      this.log.error('whoops! there was an error: ' + err);
+      this.log.error('[%s] whoops! there was an error: %s', this.name, err);
     });
 
     this.device.addListener('connected', () => {
@@ -219,21 +219,18 @@ export class RemootioHomebridgeAccessory {
       this.handleIncomingMessage(frame, decryptedPayload);
     });
     this.device.addListener('outgoingmessage', (frame: RemootioTypedFrame) => {
-      const rowToLog = new Date().toISOString() + ' Outgoing: ' + JSON.stringify(frame);
-      this.log.debug(rowToLog);
+      this.log.debug('[%s] Outgoing: \n%s', this.name, JSON.stringify(frame));
     });
 
     // Request to connect with Remootio device with auto-reconnect = true
     this.device.connect(true);
 
-    this.log.info('Remootio Garage Door Opener finished initializing!');
+    this.log.info('[%s] Finished initializing!', this.name);
   }
 
   handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload): void {
     if (decryptedPayload !== undefined) {
-      const rowToLog = new Date().toISOString() + ' Incoming: ' + JSON.stringify(decryptedPayload);
-      this.log.debug(rowToLog);
-
+      this.log.debug('[%s] Incoming:\n%s', this.name, JSON.stringify(decryptedPayload));
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
         if (decryptedPayload.event.type === 'StateChange') {
           this.setCurrentDoorState(decryptedPayload.event.state);
@@ -246,8 +243,7 @@ export class RemootioHomebridgeAccessory {
         }
       }
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
-        const rowToLog = new Date().toISOString() + ' ' + decryptedPayload.response.type;
-        this.log.info(rowToLog);
+        this.log.debug('[%s] Decrypted payload: %s', this.name, decryptedPayload.response.type);
         if (decryptedPayload.response.type === 'QUERY') {
           this.setCurrentDoorState(decryptedPayload.response.state);
         }
@@ -255,11 +251,9 @@ export class RemootioHomebridgeAccessory {
     } else {
       if (frame !== undefined) {
         if (frame.challenge === undefined && frame.type !== undefined) {
-          const rowToLog = new Date().toISOString() + ' Incoming: ' + frame.type;
-          this.log.debug(rowToLog);
+          this.log.debug('[%s] Incoming: %s', this.name, frame.type);
         } else if (frame.challenge !== undefined) {
-          const rowToLog = new Date().toISOString() + ' Challenge';
-          this.log.info(rowToLog);
+          this.log.debug('[%s] Incoming: CHALLENGE', this.name);;
         }
       }
     }
@@ -270,7 +264,7 @@ export class RemootioHomebridgeAccessory {
     switch (state) {
       case 'open':
         this.currentState = this.currentDoorState.OPEN;
-        this.log.info('Setting current state to OPEN');
+        this.log.info('[%s] Setting current state to OPEN', this.name);
         accessory
           .getService(this.hap.Service.GarageDoorOpener)!
           .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
@@ -278,7 +272,7 @@ export class RemootioHomebridgeAccessory {
         break;
       case 'closed':
         this.currentState = this.currentDoorState.CLOSED;
-        this.log.info('Setting current state to CLOSED');
+        this.log.info('[%s] Setting current state to CLOSED', this.name);
         accessory
           .getService(this.hap.Service.GarageDoorOpener)!
           .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
@@ -286,7 +280,7 @@ export class RemootioHomebridgeAccessory {
         break;
       case 'opening':
         this.currentState = this.currentDoorState.OPENING;
-        this.log.info('Setting current state to OPENING');
+        this.log.info('[%s] Setting current state to OPENING', this.name);
         accessory
           .getService(this.hap.Service.GarageDoorOpener)!
           .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
@@ -294,7 +288,7 @@ export class RemootioHomebridgeAccessory {
         break;
       case 'closing':
         this.currentState = this.currentDoorState.CLOSING;
-        this.log.info('Setting current state to CLOSING');
+        this.log.info('[%s] Setting current state to CLOSING', this.name);
         accessory
           .getService(this.hap.Service.GarageDoorOpener)!
           .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
@@ -305,10 +299,9 @@ export class RemootioHomebridgeAccessory {
 
   getCurrentStateHandler(callback: CharacteristicGetCallback): void {
     this.log.debug(
-      'getCurrentStateHandler: Current door state: [' +
-        this.currentState +
-        '] ' +
-        (this.currentState === this.currentDoorState.OPEN ? 'Open' : 'Closed'),
+      '[%s] getCurrentStateHandler: Current door state: [%s]',
+      this.name,
+      this.currentState === this.currentDoorState.OPEN ? 'Open' : 'Closed',
     );
     if (this.currentState < 0) {
       callback(new Error('No value available'));
@@ -322,10 +315,9 @@ export class RemootioHomebridgeAccessory {
 
   getTargetStateHandler(callback: CharacteristicGetCallback): void {
     this.log.debug(
-      'getTargetStateHandler: Target door state: [' +
-        this.targetState +
-        '] ' +
-        (this.targetState === this.targetDoorState.OPEN ? 'Open' : 'Closed'),
+      '[%s] getTargetStateHandler: Target door state: [%s]',
+      this.name,
+      this.targetState === this.targetDoorState.OPEN ? 'Open' : 'Closed',
     );
     if (this.targetState < 0) {
       if (this.currentState < 0) {
@@ -333,7 +325,7 @@ export class RemootioHomebridgeAccessory {
         return;
       } else {
         this.targetState = this.currentState;
-        this.log.info('Target state is uninitialized, setting target state same as current state');
+        this.log.info('[%s] Target state is uninitialized, setting target state same as current state', this.name);
       }
     }
     callback(null, this.targetState);
@@ -347,7 +339,7 @@ export class RemootioHomebridgeAccessory {
     // call sendOpen or sendClose based on value
 
     if (newValue === undefined || newValue === null) {
-      this.log.debug('setTargetStateHandler: invalid newValue');
+      this.log.debug('[%s] setTargetStateHandler: invalid newValue', this.name);
       callback(new Error('no value'));
       return;
     }
