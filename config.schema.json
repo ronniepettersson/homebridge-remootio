@@ -28,14 +28,14 @@
             "description": "The device's API Secret Key ",
             "type": "string",
             "required": true,
-            "default": "API Secret Key from App"
+            "default": ""
           },
           "apiAuthKey": {
             "title": "API Authentication Key",
             "description": "The device's API Authentication Key ",
             "type": "string",
             "required": true,
-            "default": "API Authentication Key from App"
+            "default": ""
           }
         }
       }

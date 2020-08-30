@@ -124,7 +124,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
 
     // Remove devices that are no longer found in the configuration, but we still have in HomeKit.
     for (const oldAccessory of this.accessories) {
-      if (!oldAccessory.context.device){
+      if (!oldAccessory.context.device) {
         this.log('%s: Removing Remootio device from HomeKit.', oldAccessory.displayName);
 
         delete this.configuredAccessories[oldAccessory.UUID];

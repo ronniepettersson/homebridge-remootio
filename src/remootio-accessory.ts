@@ -201,25 +201,26 @@ export class RemootioHomebridgeAccessory {
     });
 
     this.device.addListener('connected', () => {
-      this.log.info(this.name + ' connected');
+      this.log.info('[%s] Connected', this.name);
       this.device.authenticate(); //Authenticate the session (required)
     });
 
     this.device.addListener('authenticated', () => {
-      this.log.info(this.name + ' authenticated');
+      this.log.info('[%s] Authenticated', this.name);
       //this.device.sendQuery();
     });
 
     this.device.addListener('disconnect', (msg: string) => {
-      this.log.info(this.name + ' ' + msg);
+      this.log.info('[%s] Disconnected: %s', this.name, msg);
       //this.device.sendQuery();
     });
 
     this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => {
       this.handleIncomingMessage(frame, decryptedPayload);
     });
+
     this.device.addListener('outgoingmessage', (frame: RemootioTypedFrame) => {
-      this.log.debug('[%s] Outgoing: \n%s', this.name, JSON.stringify(frame));
+      this.log.debug('[%s] Outgoing: %s', this.name, frame.type);
     });
 
     // Request to connect with Remootio device with auto-reconnect = true
@@ -253,7 +254,7 @@ export class RemootioHomebridgeAccessory {
         if (frame.challenge === undefined && frame.type !== undefined) {
           this.log.debug('[%s] Incoming: %s', this.name, frame.type);
         } else if (frame.challenge !== undefined) {
-          this.log.debug('[%s] Incoming: CHALLENGE', this.name);;
+          this.log.debug('[%s] Incoming: CHALLENGE', this.name);
         }
       }
     }

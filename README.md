@@ -11,7 +11,7 @@ First of all make sure that the Remootio Websocket API is enabled `with logging`
 
 ## Limitations
 
-This plugin is still under development. It supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version 2.20, as long as the `Gate status sensor` is installed and enabled. When restarting the plugin, the device may not retain the configured room in Apple Home.
+This plugin is still under development. It supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version 2.20, as long as the `Gate status sensor` is installed and enabled. 
 
 ## Installation
 
@@ -20,23 +20,35 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 ### Installation via Homebridge Config UI X
 
 1. Search for `Homebridge Remootio` on the Plugins tab of [Config UI X](https://github.com/oznu/homebridge-config-ui-x)
-2. Install the `Homebridge Remootio` plugin and use the configuation form to configure your Remootio device.    
+2. Install the `Homebridge Remootio` plugin and use the configuration form to configure your Remootio device(s).    
 
 ### Manual install
 
 1. Install the package using: `npm install homebridge-remootio`.
-2. Edit or add `accessories` section in the `config.json` file in your home directory inside `homebridge`. See below for information.
+2. Edit or add `platforms` section in the `config.json` file in your home directory inside `homebridge`. See below for information.
 
 ### Plugin configuration 
 
 ```json
-"accessories": [
+"platforms": [
     {
-        "name": "<name of the device you want to appear in HomeKit>",
-        "ipAddress": "<the ip address of your Remootio device>",
-        "apiSecretKey": "<API Secret Key>",
-        "apiAuthKey": "<API Auth Key>",
-        "accessory": "Remootio"
+        "platform": "Remootio",
+        "devices": [
+            {
+                "name": "<name of the device you want to appear in HomeKit>",
+                "ipAddress": "<the ip address of your Remootio device>",
+                "apiSecretKey": "<API Secret Key>",
+                "apiAuthKey": "<API Auth Key>",
+                "accessory": "Remootio"
+            },
+                {
+                "name": "<name of the device you want to appear in HomeKit>",
+                "ipAddress": "<the ip address of your Remootio device>",
+                "apiSecretKey": "<API Secret Key>",
+                "apiAuthKey": "<API Auth Key>",
+                "accessory": "Remootio"
+            },
+        ]
     }
 ]
 ```
