@@ -14,6 +14,8 @@ import { PLUGIN_NAME, PLATFORM_NAME } from './settings';
 
 import { RemootioHomebridgeAccessory } from './remootio-accessory';
 
+import { RemootioDeviceType } from './remootio-types';
+
 let hap: HAP;
 let Accessory: typeof PlatformAccessory;
 
@@ -77,10 +79,10 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
         continue;
       }
 
-      // Check to see if this accessory's device object is still in myQ or not.
-      //if (!this.myQ.Devices.some((x: myQDevice) => x.serial_number === accessory.context.device.serial_number)) {
-      //  accessory.context.device = null;
-      //}
+      // Check to see if this accessory's device object is still in or not.
+      if (!this.config.devices.some((x: RemootioDeviceType) => x.apiAuthKey === accessory.context.device.apiAuthKey)) {
+        accessory.context.device = null;
+      }
     }
 
     // Iterate through the list of devices that myQ has returned and sync them with what we show HomeKit.
@@ -121,7 +123,6 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
     }
 
     // Remove devices that are no longer found in the configuration, but we still have in HomeKit.
-    /*
     for (const oldAccessory of this.accessories) {
       this.log('%s: Removing Remootio device from HomeKit.', oldAccessory.displayName);
 
@@ -129,7 +130,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
       this.accessories.splice(this.accessories.indexOf(oldAccessory), 1);
       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [oldAccessory]);
     }
-    */
+
     return true;
   }
 
