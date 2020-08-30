@@ -1,37 +1,44 @@
 {
-    "pluginAlias": "Remootio",
-    "pluginType": "accessory",
-    "singular": false,
-    "schema": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "title": "Name",
-          "type": "string",
-          "required": true,
-          "default": "Remootio Accessory"
-        },
-        "ipAddress": {
-          "title": "IP Address",
-          "description": "The device's IP address. It is recommended to set a static IP for the device.",
-          "type": "string",
-          "required": true,
-          "default": "xxx.xxx.xxx.xxx"
-        },
-        "apiSecretKey": {
-          "title": "API Secret Key",
-          "description": "The device's API Secret Key ",
-          "type": "string",
-          "required": true,
-          "default": "API Secret Key from App"
-        },
-        "apiAuthKey": {
-          "title": "API Authentication Key",
-          "description": "The device's API Authentication Key ",
-          "type": "string",
-          "required": true,
-          "default": "API Authentication Key from App"
+  "pluginAlias": "Remootio",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "devices": {
+      "type": "array",
+      "items": {
+        "title": "Remootio device",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "required": true,
+            "default": "Remootio Accessory"
+          },
+          "ipAddress": {
+            "title": "IP Address",
+            "description": "The device's IP address. It is recommended to set a static IP for the device.",
+            "type": "string",
+            "format": "ipv4",
+            "required": true,
+            "default": "192.168.1.0"
+          },
+          "apiSecretKey": {
+            "title": "API Secret Key",
+            "description": "The device's API Secret Key ",
+            "type": "string",
+            "required": true,
+            "default": "API Secret Key from App"
+          },
+          "apiAuthKey": {
+            "title": "API Authentication Key",
+            "description": "The device's API Authentication Key ",
+            "type": "string",
+            "required": true,
+            "default": "API Authentication Key from App"
+          }
         }
       }
     }
   }
+}
