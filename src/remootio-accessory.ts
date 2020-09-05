@@ -239,6 +239,8 @@ export class RemootioHomebridgeAccessory {
           // So to sync current and target door state, set target door state to closed when we get a state change to closed
           if (decryptedPayload.event.state === 'closed') {
             this.targetState = this.targetDoorState.CLOSED;
+          } else {
+            this.targetState = this.targetDoorState.OPEN;
           }
         }
         if (
