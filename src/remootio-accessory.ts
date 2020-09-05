@@ -242,6 +242,10 @@ export class RemootioHomebridgeAccessory {
           } else {
             this.targetState = this.targetDoorState.OPEN;
           }
+          this.accessory
+            .getService(this.hap.Service.GarageDoorOpener)!
+            .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
+            .updateValue(this.targetState);
         }
         if (
           decryptedPayload.event.type === 'RelayTrigger' &&
