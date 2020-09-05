@@ -235,11 +235,24 @@ export class RemootioHomebridgeAccessory {
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
         if (decryptedPayload.event.type === 'StateChange') {
           this.setCurrentDoorState(decryptedPayload.event.state);
+          // There is only one definite end state, as there is only one sensor indicating when the door is closed.
+          // So to sync current and target door state, set target door state to closed when we get a state change to closed
+          if (decryptedPayload.event.state === 'closed') {
+            this.targetState = this.targetDoorState.CLOSED;
+          }
         }
-        if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.state === 'open') {
+        if (
+          decryptedPayload.event.type === 'RelayTrigger' &&
+          decryptedPayload.event.state === 'open' &&
+          decryptedPayload.event.data?.keyType === 'api key'
+        ) {
           this.setCurrentDoorState('closing');
         }
-        if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.state === 'closed') {
+        if (
+          decryptedPayload.event.type === 'RelayTrigger' &&
+          decryptedPayload.event.state === 'closed' &&
+          decryptedPayload.event.data?.keyType === 'api key'
+        ) {
           this.setCurrentDoorState('opening');
         }
       }
@@ -340,7 +353,7 @@ export class RemootioHomebridgeAccessory {
     // call sendOpen or sendClose based on value
 
     if (newValue === undefined || newValue === null) {
-      this.log.debug('[%s] setTargetStateHandler: invalid newValue', this.name);
+      this.log.debug('[%s] setTargetStateHandler: invalid new value', this.name);
       callback(new Error('no value'));
       return;
     }
@@ -348,22 +361,22 @@ export class RemootioHomebridgeAccessory {
     const newState = newValue as number;
 
     this.log.info(
-      'setTargetStateHandler: New value: ' +
-        garageDoorOpenerStateToString[newState] +
-        ' Old value: ' +
-        garageDoorOpenerStateToString[oldState],
+      '[%s] setTargetStateHandler: New value: %s Old value: %s',
+      this.name,
+      garageDoorOpenerStateToString[newState],
+      garageDoorOpenerStateToString[oldState],
     );
     if (newState !== oldState) {
       if (!this.device.isConnected || !this.device.isAuthenticated) {
-        this.log.warn('Device is not connected');
+        this.log.warn('[%s] Device is not connected', this.name);
         return callback(new Error('Not Connected'));
       }
       this.targetState = newState;
       if (newState === this.targetDoorState.OPEN) {
-        this.log.info('Sending sendOpen()');
+        this.log.info('[%s] Sending sendOpen()', this.name);
         this.device.sendOpen();
       } else if (newState === this.targetDoorState.CLOSED) {
-        this.log.info('Sending sendClose()');
+        this.log.info('[%s] Sending sendClose()', this.name);
         this.device.sendClose();
       }
     }
