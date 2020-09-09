@@ -233,33 +233,20 @@ export class RemootioHomebridgeAccessory {
     if (decryptedPayload !== undefined) {
       this.log.debug('[%s] Incoming:\n%s', this.name, JSON.stringify(decryptedPayload));
       if (decryptedPayload.event !== undefined && decryptedPayload.event.state !== undefined) {
+        // As there are multiple sources for triggering a state change, such as remote control press, Remootio app,
+        // we're syncing current and target states when we receive a StateChange event.
         if (decryptedPayload.event.type === 'StateChange') {
           this.setCurrentDoorState(decryptedPayload.event.state);
-          // There is only one definite end state, as there is only one sensor indicating when the door is closed.
-          // So to sync current and target door state, set target door state to closed when we get a state change to closed
-          if (decryptedPayload.event.state === 'closed') {
-            this.targetState = this.targetDoorState.CLOSED;
+          this.setTargetDoorState(decryptedPayload.event.state);
+        }
+        // If the command is triggered via api key, it comes from homebridge.
+        // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
+        if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
+          if (decryptedPayload.event.state === 'open') {
+            this.setCurrentDoorState('closing');
           } else {
-            this.targetState = this.targetDoorState.OPEN;
+            this.setCurrentDoorState('opening');
           }
-          this.accessory
-            .getService(this.hap.Service.GarageDoorOpener)!
-            .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
-            .updateValue(this.targetState);
-        }
-        if (
-          decryptedPayload.event.type === 'RelayTrigger' &&
-          decryptedPayload.event.state === 'open' &&
-          decryptedPayload.event.data?.keyType === 'api key'
-        ) {
-          this.setCurrentDoorState('closing');
-        }
-        if (
-          decryptedPayload.event.type === 'RelayTrigger' &&
-          decryptedPayload.event.state === 'closed' &&
-          decryptedPayload.event.data?.keyType === 'api key'
-        ) {
-          this.setCurrentDoorState('opening');
         }
       }
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
@@ -281,38 +268,50 @@ export class RemootioHomebridgeAccessory {
 
   setCurrentDoorState(state: string) {
     const accessory = this.accessory;
+    const characteristics = accessory
+      .getService(this.hap.Service.GarageDoorOpener)!
+      .getCharacteristic(this.hap.Characteristic.CurrentDoorState);
+
     switch (state) {
       case 'open':
         this.currentState = this.currentDoorState.OPEN;
         this.log.info('[%s] Setting current state to OPEN', this.name);
-        accessory
-          .getService(this.hap.Service.GarageDoorOpener)!
-          .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
-          .updateValue(this.currentDoorState.OPEN);
+        characteristics.updateValue(this.currentDoorState.OPEN);
         break;
       case 'closed':
         this.currentState = this.currentDoorState.CLOSED;
         this.log.info('[%s] Setting current state to CLOSED', this.name);
-        accessory
-          .getService(this.hap.Service.GarageDoorOpener)!
-          .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
-          .updateValue(this.currentDoorState.CLOSED);
+        characteristics.updateValue(this.currentDoorState.CLOSED);
         break;
       case 'opening':
         this.currentState = this.currentDoorState.OPENING;
         this.log.info('[%s] Setting current state to OPENING', this.name);
-        accessory
-          .getService(this.hap.Service.GarageDoorOpener)!
-          .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
-          .updateValue(this.currentDoorState.OPENING);
+        characteristics.updateValue(this.currentDoorState.OPENING);
         break;
       case 'closing':
         this.currentState = this.currentDoorState.CLOSING;
         this.log.info('[%s] Setting current state to CLOSING', this.name);
-        accessory
-          .getService(this.hap.Service.GarageDoorOpener)!
-          .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
-          .updateValue(this.currentDoorState.CLOSING);
+        characteristics.updateValue(this.currentDoorState.CLOSING);
+        break;
+    }
+  }
+
+  setTargetDoorState(state: string) {
+    const accessory = this.accessory;
+    const characteristics = accessory
+      .getService(this.hap.Service.GarageDoorOpener)!
+      .getCharacteristic(this.hap.Characteristic.TargetDoorState);
+
+    switch (state) {
+      case 'open':
+        this.targetState = this.targetDoorState.OPEN;
+        this.log.info('[%s] Setting target state to OPEN', this.name);
+        characteristics.updateValue(this.targetDoorState.OPEN);
+        break;
+      case 'closed':
+        this.targetState = this.targetDoorState.CLOSED;
+        this.log.info('[%s] Setting target state to CLOSED', this.name);
+        characteristics.updateValue(this.targetDoorState.CLOSED);
         break;
     }
   }
