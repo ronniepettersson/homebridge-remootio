@@ -105,6 +105,8 @@ export class RemootioHomebridgeAccessory {
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
+  private lastIncoming100ms = 0;
+  private readonly t100msDelay = 500; 
 
   //private garageDoorOpenerService!: Service;
   //private informationService!: Service;
@@ -236,12 +238,14 @@ export class RemootioHomebridgeAccessory {
         // As there are multiple sources for triggering a state change, such as remote control press, Remootio app,
         // we're syncing current and target states when we receive a StateChange event.
         if (decryptedPayload.event.type === 'StateChange') {
+          this.lastIncoming100ms = decryptedPayload.event.t100ms;
           this.setCurrentDoorState(decryptedPayload.event.state);
           this.setTargetDoorState(decryptedPayload.event.state);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
         if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
+          this.lastIncoming100ms = decryptedPayload.event.t100ms;
           if (decryptedPayload.event.state === 'open') {
             this.setCurrentDoorState('closing');
           } else {
@@ -251,7 +255,10 @@ export class RemootioHomebridgeAccessory {
       }
       if (decryptedPayload.response !== undefined && decryptedPayload.response.state !== undefined) {
         this.log.debug('[%s] Decrypted payload: %s', this.name, decryptedPayload.response.type);
-        if (decryptedPayload.response.type === 'QUERY') {
+        if (
+          decryptedPayload.response.type === 'QUERY' &&
+          decryptedPayload.response.t100ms - this.lastIncoming100ms > this.t100msDelay // wait xx ms before accepting a new state
+        ) {
           this.setCurrentDoorState(decryptedPayload.response.state);
         }
       }
