@@ -36,20 +36,26 @@ type RemootioError = {
 type RemootioPing = {
   type: 'PING';
 };
+type RemootioPong = {
+  type: 'PONG';
+};
 type RemootioHello = {
   type: 'HELLO';
+};
+type RemootioServerHello = {
+  type: 'SERVER_HELLO';
   apiVersion: number;
   message: string;
 };
 
-interface RemootioChallenge {
+type RemootioChallenge = {
   challenge: {
     sessionKey: string;
     initialActionId: number;
   };
-}
+};
 
-interface RemootioEvent {
+type RemootioEvent = {
   event: {
     cnt: number;
     type: string;
@@ -62,9 +68,9 @@ interface RemootioEvent {
       imeOpen100ms?: number;
     };
   };
-}
+};
 
-interface RemootioResponse {
+type RemootioResponse = {
   response: {
     type: string;
     id: number;
@@ -74,9 +80,15 @@ interface RemootioResponse {
     relayTriggered: boolean;
     errorCode: string;
   };
-}
+};
 
-type RemootioTypedFrame = RemootioEncryptedPayload | RemootioError | RemootioPing | RemootioHello;
+type RemootioTypedFrame =
+  | RemootioEncryptedPayload
+  | RemootioError
+  | RemootioPing
+  | RemootioPong
+  | RemootioHello
+  | RemootioServerHello;
 
 type RemootioFrame = RemootioTypedFrame & RemootioChallenge;
 
@@ -106,7 +118,7 @@ export class RemootioHomebridgeAccessory {
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
   private lastIncoming100ms = 0;
-  private readonly t100msDelay = 500; 
+  private readonly t100msDelay = 500;
 
   //private garageDoorOpenerService!: Service;
   //private informationService!: Service;
@@ -174,12 +186,13 @@ export class RemootioHomebridgeAccessory {
     accessory
       .getService(this.hap.Service.GarageDoorOpener)!
       .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
-      .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this));
-
-    accessory
-      .getService(this.hap.Service.GarageDoorOpener)!
-      .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
+      .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
       .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
+
+    //accessory
+    //  .getService(this.hap.Service.GarageDoorOpener)!
+    //  .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
+    //  .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
 
     accessory
       .getService(this.hap.Service.GarageDoorOpener)!
@@ -311,14 +324,18 @@ export class RemootioHomebridgeAccessory {
 
     switch (state) {
       case 'open':
-        this.targetState = this.targetDoorState.OPEN;
-        this.log.info('[%s] Setting target state to OPEN', this.name);
-        characteristics.updateValue(this.targetDoorState.OPEN);
+        if (this.targetState !== this.targetDoorState.OPEN) {
+          this.targetState = this.targetDoorState.OPEN;
+          this.log.info('[%s] Setting target state to OPEN', this.name);
+          characteristics.updateValue(this.targetDoorState.OPEN);
+        }
         break;
       case 'closed':
-        this.targetState = this.targetDoorState.CLOSED;
-        this.log.info('[%s] Setting target state to CLOSED', this.name);
-        characteristics.updateValue(this.targetDoorState.CLOSED);
+        if (this.targetState !== this.targetDoorState.CLOSED) {
+          this.targetState = this.targetDoorState.CLOSED;
+          this.log.info('[%s] Setting target state to CLOSED', this.name);
+          characteristics.updateValue(this.targetDoorState.CLOSED);
+        }
         break;
     }
   }
