@@ -111,6 +111,9 @@ export class RemootioHomebridgeAccessory {
   private apiSecretKey!: string;
   private apiAuthKey!: string;
   private pingInterval = 60000;
+  private connectionAttempts = 0;
+  private connectionAttemptLimit = 10;
+  private autoConnectFallbackTimeSeconds = 60;
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
@@ -218,6 +221,7 @@ export class RemootioHomebridgeAccessory {
     this.device.addListener('connected', () => {
       this.log.info('[%s] Connected', this.name);
       this.device.authenticate(); //Authenticate the session (required)
+      this.connectionAttempts = 0; //Reset the connectionAttempts counter
     });
 
     this.device.addListener('authenticated', () => {
@@ -225,8 +229,17 @@ export class RemootioHomebridgeAccessory {
       //this.device.sendQuery();
     });
 
+    this.device.addListener('connecting', (msg: string) => {
+      this.log.debug('[%s] Connecting: %s', this.name, msg);
+      //this.device.sendQuery();
+    });
+
     this.device.addListener('disconnect', (msg: string) => {
-      this.log.info('[%s] Disconnected: %s', this.name, msg);
+      this.log.debug('[%s] Disconnected: %s', this.name, msg);
+      this.connectionAttempts++;
+      if (this.connectionAttempts > this.connectionAttemptLimit) {
+        this.device.autoReconnect = false;
+      }
       //this.device.sendQuery();
     });
 
