@@ -244,12 +244,14 @@ export class RemootioHomebridgeAccessory {
           this.autoConnectFallbackTimeSeconds,
         );
         this.device.autoReconnect = false;
-        this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
-          this.device.autoReconnect = true;
-          //this.device.connect(true);
-          this.autoConnectFallbackTimeoutHandle = undefined;
-          this.log.debug('[%s] Fallback timer completed, retrying', this.name);
-        }, this.autoConnectFallbackTimeSeconds * 1000);
+        if (!this.autoConnectFallbackTimeoutHandle) {
+          this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
+            this.device.autoReconnect = true;
+            //this.device.connect(true);
+            this.autoConnectFallbackTimeoutHandle = undefined;
+            this.log.debug('[%s] Fallback timer completed, retrying', this.name);
+          }, this.autoConnectFallbackTimeSeconds * 1000);
+        }
       }
     });
 
@@ -261,10 +263,10 @@ export class RemootioHomebridgeAccessory {
       this.log.debug('[%s] Outgoing: %s', this.name, frame.type);
     });
 
+    this.log.info('[%s] Finished initializing!', this.name);
+
     // Request to connect with Remootio device with auto-reconnect = true
     this.device.connect(true);
-
-    this.log.info('[%s] Finished initializing!', this.name);
   }
 
   handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload): void {
