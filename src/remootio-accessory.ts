@@ -238,17 +238,17 @@ export class RemootioHomebridgeAccessory {
     this.device.addListener('disconnect', (msg: string) => {
       this.log.debug('[%s] Disconnected: %s', this.name, msg);
       if (this.connectionAttempts > this.connectionAttemptLimit) {
-        this.log.debug(
-          '[%s] Too many connection attempts, falling back %d seconds',
-          this.name,
-          this.autoConnectFallbackTimeSeconds,
-        );
         this.device.autoReconnect = false;
         if (!this.autoConnectFallbackTimeoutHandle) {
+          this.log.debug(
+            '[%s] Too many connection attempts, falling back %d seconds',
+            this.name,
+            this.autoConnectFallbackTimeSeconds,
+          );
           this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
-            this.device.autoReconnect = true;
-            //this.device.connect(true);
             this.autoConnectFallbackTimeoutHandle = undefined;
+            this.device.autoReconnect = true;
+            this.device.connect(true);
             this.log.debug('[%s] Fallback timer completed, retrying', this.name);
           }, this.autoConnectFallbackTimeSeconds * 1000);
         }
