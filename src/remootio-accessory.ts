@@ -114,6 +114,7 @@ export class RemootioHomebridgeAccessory {
   private connectionAttempts = 0;
   private connectionAttemptLimit = 10;
   private autoConnectFallbackTimeSeconds = 60;
+  private autoConnectFallbackTimeoutHandle;
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
@@ -231,16 +232,24 @@ export class RemootioHomebridgeAccessory {
 
     this.device.addListener('connecting', (msg: string) => {
       this.log.debug('[%s] Connecting: %s', this.name, msg);
-      //this.device.sendQuery();
+      this.connectionAttempts++;
     });
 
     this.device.addListener('disconnect', (msg: string) => {
       this.log.debug('[%s] Disconnected: %s', this.name, msg);
-      this.connectionAttempts++;
       if (this.connectionAttempts > this.connectionAttemptLimit) {
+        this.log.debug(
+          '[%s] Too many connection attempts, falling back %d seconds',
+          this.name,
+          this.autoConnectFallbackTimeSeconds,
+        );
         this.device.autoReconnect = false;
+        this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
+          this.device.autoReconnect = true;
+          this.device.connect(true);
+          this.log.debug('[%s] Fallback timer completed, retrying', this.name);
+        }, this.autoConnectFallbackTimeSeconds);
       }
-      //this.device.sendQuery();
     });
 
     this.device.addListener('incomingmessage', (frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload) => {
