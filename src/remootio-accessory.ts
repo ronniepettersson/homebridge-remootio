@@ -246,9 +246,9 @@ export class RemootioHomebridgeAccessory {
         this.device.autoReconnect = false;
         this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
           this.device.autoReconnect = true;
-          this.device.connect(true);
+          //this.device.connect(true);
           this.log.debug('[%s] Fallback timer completed, retrying', this.name);
-        }, this.autoConnectFallbackTimeSeconds);
+        }, this.autoConnectFallbackTimeSeconds * 1000);
       }
     });
 
