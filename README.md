@@ -10,8 +10,7 @@
 
 
 
-[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version >=2.20, as long as the `Gate status sensor` is installed and enabled. 
-
+[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version >=2.21 that provides the new [V2 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v2_specification.md).
 
 ## Usage
 First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. Install the `Gate status sensor` and enable it in the app.
