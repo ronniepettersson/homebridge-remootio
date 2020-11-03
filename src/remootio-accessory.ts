@@ -310,11 +310,15 @@ export class RemootioHomebridgeAccessory {
       }
     } else {
       if (frame !== undefined) {
-        if (frame.challenge === undefined && frame.type !== undefined) {
-          this.log.debug('[%s] Incoming: %s\n%s', this.name, frame.type, JSON.stringify(frame));
-        } else if (frame.challenge !== undefined) {
-          this.log.debug('[%s] Incoming: CHALLENGE', this.name);
+        switch (frame.type) {
+          case 'PONG':
+            this.log.debug('[%s] Incoming: %s', this.name, frame.type);
+            break;
+          default:
+            this.log.debug('[%s] Incoming: %s\n%s', this.name, frame.type, JSON.stringify(frame));
         }
+      } else {
+        this.log.debug('[%s] Incoming: \n%s', this.name, JSON.stringify(frame));
       }
     }
   }
