@@ -221,13 +221,14 @@ export class RemootioHomebridgeAccessory {
 
     this.device.addListener('connected', () => {
       this.log.info('[%s] Connected', this.name);
+      this.device.sendHello();
       this.device.authenticate(); //Authenticate the session (required)
       this.connectionAttempts = 0; //Reset the connectionAttempts counter
     });
 
     this.device.addListener('authenticated', () => {
       this.log.info('[%s] Authenticated', this.name);
-      this.device.sendHello();
+      //this.device.sendHello();
     });
 
     this.device.addListener('connecting', (msg: string) => {
@@ -308,6 +309,7 @@ export class RemootioHomebridgeAccessory {
       if (frame !== undefined) {
         if (frame.challenge === undefined && frame.type !== undefined) {
           this.log.debug('[%s] Incoming: %s', this.name, frame.type);
+          this.log.debug('%s', JSON.stringify(frame));
         } else if (frame.challenge !== undefined) {
           this.log.debug('[%s] Incoming: CHALLENGE', this.name);
         }
