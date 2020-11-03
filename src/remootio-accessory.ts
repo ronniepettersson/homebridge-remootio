@@ -46,6 +46,8 @@ type RemootioServerHello = {
   type: 'SERVER_HELLO';
   apiVersion: number;
   message: string;
+  serialNumber?: string;
+  remootioVersion?: 'remootio-1' | 'remootio-2';
 };
 
 type RemootioChallenge = {
@@ -239,7 +241,6 @@ export class RemootioHomebridgeAccessory {
     this.device.addListener('disconnect', (msg: string) => {
       this.log.debug('[%s] Disconnected: %s', this.name, msg);
       if (this.connectionAttempts > this.connectionAttemptLimit) {
-        this.device.autoReconnect = false;
         if (this.connectionAttempts < 100) {
           if (!this.autoConnectFallbackTimeoutHandle) {
             this.log.debug(
@@ -250,13 +251,15 @@ export class RemootioHomebridgeAccessory {
             this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
               this.log.debug('[%s] Fallback timer completed, retrying', this.name);
               this.autoConnectFallbackTimeoutHandle = undefined;
-              this.device.autoReconnect = true;
-              this.device.connect(true);
+              this.device.connect(false);
             }, this.autoConnectFallbackTimeSeconds * 1000);
           }
         } else {
           this.log.error('[%s] Too many connection attempts, giving up', this.name);
         }
+      } else {
+        this.log.debug('[%s] Reconnecting', this.name);
+        this.device.connect(false);
       }
     });
 
@@ -271,7 +274,7 @@ export class RemootioHomebridgeAccessory {
     this.log.info('[%s] Finished initializing!', this.name);
 
     // Request to connect with Remootio device with auto-reconnect = true
-    this.device.connect(true);
+    this.device.connect(false);
   }
 
   handleIncomingMessage(frame: RemootioFrame, decryptedPayload: RemootioDecryptedPayload): void {
@@ -308,8 +311,7 @@ export class RemootioHomebridgeAccessory {
     } else {
       if (frame !== undefined) {
         if (frame.challenge === undefined && frame.type !== undefined) {
-          this.log.debug('[%s] Incoming: %s', this.name, frame.type);
-          this.log.debug('%s', JSON.stringify(frame));
+          this.log.debug('[%s] Incoming: %s\n%s', this.name, frame.type, JSON.stringify(frame));
         } else if (frame.challenge !== undefined) {
           this.log.debug('[%s] Incoming: CHALLENGE', this.name);
         }
