@@ -227,7 +227,7 @@ export class RemootioHomebridgeAccessory {
 
     this.device.addListener('authenticated', () => {
       this.log.info('[%s] Authenticated', this.name);
-      //this.device.sendQuery();
+      this.device.sendHello();
     });
 
     this.device.addListener('connecting', (msg: string) => {
@@ -239,18 +239,22 @@ export class RemootioHomebridgeAccessory {
       this.log.debug('[%s] Disconnected: %s', this.name, msg);
       if (this.connectionAttempts > this.connectionAttemptLimit) {
         this.device.autoReconnect = false;
-        if (!this.autoConnectFallbackTimeoutHandle) {
-          this.log.debug(
-            '[%s] Too many connection attempts, falling back %d seconds',
-            this.name,
-            this.autoConnectFallbackTimeSeconds,
-          );
-          this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
-            this.autoConnectFallbackTimeoutHandle = undefined;
-            this.device.autoReconnect = true;
-            this.device.connect(true);
-            this.log.debug('[%s] Fallback timer completed, retrying', this.name);
-          }, this.autoConnectFallbackTimeSeconds * 1000);
+        if (this.connectionAttempts < 100) {
+          if (!this.autoConnectFallbackTimeoutHandle) {
+            this.log.debug(
+              '[%s] Too many connection attempts, falling back %d seconds',
+              this.name,
+              this.autoConnectFallbackTimeSeconds,
+            );
+            this.autoConnectFallbackTimeoutHandle = setTimeout(() => {
+              this.log.debug('[%s] Fallback timer completed, retrying', this.name);
+              this.autoConnectFallbackTimeoutHandle = undefined;
+              this.device.autoReconnect = true;
+              this.device.connect(true);
+            }, this.autoConnectFallbackTimeSeconds * 1000);
+          }
+        } else {
+          this.log.error('[%s] Too many connection attempts, giving up', this.name);
         }
       }
     });
