@@ -212,8 +212,7 @@ export class RemootioHomebridgeAccessory {
     // Update the manufacturer information for this device.
     accessory
       .getService(this.hap.Service.AccessoryInformation)!
-      .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Remootio')
-      .setCharacteristic(this.hap.Characteristic.Model, 'Remootio');
+      .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Remootio');
 
     // Registering the listeners for the Remootio API client
     // https://documents.remootio.com/docs/WebsocketApiDocs.pdf
