@@ -328,13 +328,21 @@ export class RemootioHomebridgeAccessory {
 
   handleServerHello(frame: RemootioFrame) {
     const serverHello = frame as RemootioServerHello;
+    const accessory = this.accessory;
+    const remootioVersion = serverHello.remootioVersion as string;
+    const serialNumber = serverHello.serialNumber as string;
     this.log.debug(
       '[%s] SERVER_HELLO: APIv: %d, S/N: %s, Version: %s',
       this.name,
       serverHello.apiVersion,
-      serverHello.serialNumber,
-      serverHello.remootioVersion,
+      serialNumber,
+      remootioVersion,
     );
+    // Update the manufacturer information for this device.
+    accessory
+      .getService(this.hap.Service.AccessoryInformation)!
+      .setCharacteristic(this.hap.Characteristic.Model, remootioVersion)
+      .setCharacteristic(this.hap.Characteristic.SerialNumber, serialNumber);
   }
 
   setCurrentDoorState(state: string) {
