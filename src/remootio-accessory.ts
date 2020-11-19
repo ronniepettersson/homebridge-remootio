@@ -223,14 +223,14 @@ export class RemootioHomebridgeAccessory {
 
     this.device.addListener('connected', () => {
       this.log.info('[%s] Connected', this.name);
-      this.device.sendHello();
+      //this.device.sendHello();
       this.device.authenticate(); //Authenticate the session (required)
       this.connectionAttempts = 0; //Reset the connectionAttempts counter
     });
 
     this.device.addListener('authenticated', () => {
       this.log.info('[%s] Authenticated', this.name);
-      //this.device.sendHello();
+      this.device.sendHello();
     });
 
     this.device.addListener('connecting', (msg: string) => {
@@ -314,6 +314,9 @@ export class RemootioHomebridgeAccessory {
           case 'PONG':
             this.log.debug('[%s] Incoming: %s', this.name, frame.type);
             break;
+          case 'SERVER_HELLO':
+            this.handleServerHello(frame);
+            break;
           default:
             this.log.debug('[%s] Incoming: %s\n%s', this.name, frame.type, JSON.stringify(frame));
         }
@@ -321,6 +324,17 @@ export class RemootioHomebridgeAccessory {
         this.log.debug('[%s] Incoming: \n%s', this.name, JSON.stringify(frame));
       }
     }
+  }
+
+  handleServerHello(frame: RemootioFrame) {
+    const serverHello = frame as RemootioServerHello;
+    this.log.debug(
+      '[%s] SERVER_HELLO: APIv %d, S/N: %s, Ver %s',
+      this.name,
+      serverHello.apiVersion,
+      serverHello.serialNumber,
+      serverHello.type,
+    );
   }
 
   setCurrentDoorState(state: string) {
