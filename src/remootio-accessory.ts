@@ -329,11 +329,11 @@ export class RemootioHomebridgeAccessory {
   handleServerHello(frame: RemootioFrame) {
     const serverHello = frame as RemootioServerHello;
     this.log.debug(
-      '[%s] SERVER_HELLO: APIv %d, S/N: %s, Ver %s',
+      '[%s] SERVER_HELLO: APIv: %d, S/N: %s, Version: %s',
       this.name,
       serverHello.apiVersion,
       serverHello.serialNumber,
-      serverHello.type,
+      serverHello.remootioVersion,
     );
   }
 
