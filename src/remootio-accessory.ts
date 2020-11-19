@@ -217,7 +217,7 @@ export class RemootioHomebridgeAccessory {
     // Registering the listeners for the Remootio API client
     // https://documents.remootio.com/docs/WebsocketApiDocs.pdf
     this.device.on('error', (err) => {
-      this.log.error('[%s] whoops! there was an error: %s', this.name, err);
+      this.log.error('[%s] Whoops! there was an error: %s', this.name, err);
     });
 
     this.device.addListener('connected', () => {
@@ -232,9 +232,9 @@ export class RemootioHomebridgeAccessory {
       this.device.sendHello();
     });
 
-    this.device.addListener('connecting', (msg: string) => {
+    this.device.addListener('connecting', () => {
       this.connectionAttempts++;
-      this.log.debug('[%s] Connecting: %s, attempt %d', this.name, msg, this.connectionAttempts);
+      this.log.debug('[%s] Connecting: attempt %d', this.name, this.connectionAttempts);
     });
 
     this.device.addListener('disconnect', (msg: string) => {
