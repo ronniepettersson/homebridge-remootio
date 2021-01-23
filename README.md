@@ -52,6 +52,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
     }
 ]
 ```
-
+## Troubleshooting
+Most "No Response" issues are related to the device WebSocket API not being fully enabled, and therefore does not respond to API calls. To address this problem, use the Remootio mobile app to disable and then enable the WebSocket API. Thereafter, reboot the device.   
 
 

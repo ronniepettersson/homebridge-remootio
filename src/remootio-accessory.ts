@@ -222,14 +222,12 @@ export class RemootioHomebridgeAccessory {
 
     this.device.addListener('connected', () => {
       this.log.info('[%s] Connected', this.name);
-      //this.device.sendHello();
       this.device.authenticate(); //Authenticate the session (required)
       this.connectionAttempts = 0; //Reset the connectionAttempts counter
     });
 
     this.device.addListener('authenticated', () => {
       this.log.info('[%s] Authenticated', this.name);
-      // Commenting out this line due to an apparent bug in some Remootio devices rebooting when receiving the hello message
       this.device.sendHello();
     });
 
