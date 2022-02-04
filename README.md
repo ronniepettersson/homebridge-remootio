@@ -7,10 +7,11 @@
 # Homebridge Remootio
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 <a href="https://www.npmjs.com/package/homebridge-remootio"><img title="npm version" src="https://badgen.net/npm/v/homebridge-remootio" ></a>
+[![npm](https://badgen.net/npm/dt/homebridge-remootio?label=downloads)](https://www.npmjs.com/package/homebridge-remootio)
 
 
 
-[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version >=2.23 that provides the new [V2 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v2_specification.md).
+[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports <B>Remootio 1</B>, <B>Remootio 2</B> and <B>Remootio 3</B> with software version >=2.23 that provides the new [V2 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v2_specification.md).
 
 ## Usage
 First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. The `Gate status sensor` is required for the plugin to work. 
@@ -37,6 +38,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 "platforms": [
     {
         "platform": "Remootio",
+        "name": "Remootio",
         "devices": [
             {
                 "name": "<name of the device you want to appear in HomeKit>",
