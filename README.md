@@ -35,6 +35,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 "platforms": [
     {
         "platform": "Remootio",
+        "name": "Remootio",
         "devices": [
             {
                 "name": "<name of the device you want to appear in HomeKit>",
