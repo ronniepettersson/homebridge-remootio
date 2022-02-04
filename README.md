@@ -7,6 +7,7 @@
 # Homebridge Remootio
 [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 <a href="https://www.npmjs.com/package/homebridge-remootio"><img title="npm version" src="https://badgen.net/npm/v/homebridge-remootio" ></a>
+[![npm](https://badgen.net/npm/dt/homebridge-remootio?label=downloads)](https://www.npmjs.com/package/homebridge-remootio)
 
 
 
