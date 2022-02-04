@@ -13,11 +13,13 @@
 [Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports both [Remootio 1](https://www.remootio.com/products/remootio) and [Remootio 2](https://www.remootio.com/products/remootio) with software version >=2.23 that provides the new [V2 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v2_specification.md).
 
 ## Usage
-First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. Install the `Gate status sensor` and enable it in the app.
+First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. The `Gate status sensor` is required for the plugin to work. 
 
 ## Installation
 
 If you are new to Homebridge, please first read the [Homebridge](https://homebridge.io) [documentation](https://github.com/homebridge/homebridge/wiki) and installation instructions before proceeding.
+
+1. Install the `Gate status sensor` and enable it in the app.
 
 ### Installation via Homebridge Config UI X
 
@@ -54,5 +56,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 ```
 ## Troubleshooting
 Most "No Response" issues are related to the device WebSocket API not being fully enabled, and therefore does not respond to API calls. To address this problem, use the Remootio mobile app to disable and then enable the WebSocket API. Thereafter, reboot the device.   
+
+
 
 
