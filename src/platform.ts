@@ -48,7 +48,7 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
      * This event can also be used to start discovery of new accessories.
      */
     api.on(APIEvent.DID_FINISH_LAUNCHING, () => {
-      log.info('Remotio platform didFinishLaunching()');
+      log.info('Remootio platform didFinishLaunching()');
 
       this.discoverAndSyncAccessories();
       // The idea of this plugin is that we open a http service which exposes api calls to add or remove accessories
