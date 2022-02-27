@@ -18,7 +18,7 @@ import {
 
 import { RemootioPlatform } from './platform';
 
-import RemootioDevice = require('remootio-api-client');
+import RemootioDevice = require('@ronniepettersson/remootio-api-client');
 
 // Here are a subset of the Remootio API payloads sent by the device over web sockets
 type RemootioEncryptedPayload = {
