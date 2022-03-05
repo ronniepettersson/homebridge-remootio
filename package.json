@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "Homebridge plugin for Remootio",
   "main": "dist/index.js",
   "scripts": {
@@ -57,5 +57,12 @@
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.5"
+  },
+  "overrides": {
+    "optimist": {
+      ".": "^0.6.1",
+      "minimist":"^1.2.5" 
+    },
+    "put":"https://registry.npmjs.org/@ronniepettersson/put/-/put-1.1.0.tgz"
   }
 }
