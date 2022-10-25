@@ -118,6 +118,9 @@ export class RemootioHomebridgeAccessory {
   private autoConnectFallbackTimeSeconds = 60;
   private autoConnectFallbackTimeoutHandle;
 
+  private freeRelayOutput = false;
+  private secondaryName!: string;
+
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
 
@@ -208,6 +211,18 @@ export class RemootioHomebridgeAccessory {
         this.log.debug('[%s] ObstructionDetected was requested', this.name);
         callback(null, false);
       });
+
+    if (config.freeRelayOutput !== undefined && config.freeRelayOutput === true) {
+      this.freeRelayOutput = true;
+      this.secondaryName = config.secondaryName;
+      const secondaryRelayService = accessory.addService(
+        this.api.hap.Service.Switch,
+        'Secondary Relay',
+        'USER_DEFINED_SUBTYPE',
+      );
+      secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.Name, config.secondaryName);
+      this.log.debug('[%s][%s] Secondary Relay was added', this.name, this.secondaryName);
+    }
 
     // Update the manufacturer information for this device.
     accessory
