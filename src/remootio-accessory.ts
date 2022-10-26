@@ -430,10 +430,10 @@ export class RemootioHomebridgeAccessory {
     const characteristics = accessory.getService('Secondary Relay')!.getCharacteristic(this.hap.Characteristic.On);
 
     if (state) {
-      this.log.info('[%s] Setting secondry relay state to true', this.name);
+      this.log.info('[%s] Setting secondary relay state to true', this.name);
       characteristics.updateValue(true);
     } else {
-      this.log.info('[%s] Setting secondry relay state to false', this.name);
+      this.log.info('[%s] Setting secondary relay state to false', this.name);
       characteristics.updateValue(false);
     }
   }
@@ -515,14 +515,14 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the secondary relay.
    *
    */
-  handleOnSet(value: CharacteristicValue, callback: CharacteristicSetCallback): void {
+  handleOnSet(value: CharacteristicValue): void {
     // call On regardless of value
 
     this.log.info('[%s] handleOnSet: value: %s', this.name, value);
     if (value === true) {
       this.device.sendTriggerSecondary();
     }
-    callback(null);
+    //callback(null);
   }
 
   handleOnGet(): void {
