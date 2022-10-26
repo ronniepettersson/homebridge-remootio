@@ -198,11 +198,6 @@ export class RemootioHomebridgeAccessory {
       .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
       .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
 
-    //accessory
-    //  .getService(this.hap.Service.GarageDoorOpener)!
-    //  .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
-    //  .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
-
     accessory
       .getService(this.hap.Service.GarageDoorOpener)!
       .getCharacteristic(this.hap.Characteristic.ObstructionDetected)!
@@ -212,6 +207,7 @@ export class RemootioHomebridgeAccessory {
         callback(null, false);
       });
 
+    // Add secondary relay Service
     if (config.freeRelayOutput !== undefined && config.freeRelayOutput === true) {
       this.freeRelayOutput = true;
       this.secondaryName = config.secondaryName;
@@ -221,6 +217,12 @@ export class RemootioHomebridgeAccessory {
         'USER_DEFINED_SUBTYPE',
       );
       secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.Name, config.secondaryName);
+
+      secondaryRelayService
+        .getCharacteristic(this.api.hap.Characteristic.On)
+        //.onGet(this.handleOnGet.bind(this))
+        .onSet(this.handleOnSet.bind(this));
+
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, this.secondaryName);
     }
 
@@ -304,6 +306,11 @@ export class RemootioHomebridgeAccessory {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           this.setCurrentDoorState(decryptedPayload.event.state);
           this.setTargetDoorState(decryptedPayload.event.state);
+        }
+        // SecondaryRelayTrigger
+        if (decryptedPayload.event.type === 'SecondaryRelayTrigger') {
+          this.lastIncoming100ms = decryptedPayload.event.t100ms;
+          this.setSecondRelayState(false);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
@@ -416,6 +423,19 @@ export class RemootioHomebridgeAccessory {
     }
   }
 
+  setSecondRelayState(state: boolean) {
+    const accessory = this.accessory;
+    const characteristics = accessory.getService('Secondary Relay')!.getCharacteristic(this.hap.Characteristic.On);
+
+    if (state) {
+      this.log.info('[%s] Setting secondry relay state to true', this.name);
+      characteristics.updateValue(true);
+    } else {
+      this.log.info('[%s] Setting secondry relay state to false', this.name);
+      characteristics.updateValue(false);
+    }
+  }
+
   getCurrentStateHandler(callback: CharacteristicGetCallback): void {
     this.log.debug(
       '[%s] getCurrentStateHandler: Current door state: [%s]',
@@ -487,5 +507,23 @@ export class RemootioHomebridgeAccessory {
     }
 
     callback(null);
+  }
+
+  /*
+   * This method implements the logic for sending a trigger to the secondary relay.
+   *
+   */
+  handleOnSet(value: CharacteristicValue, callback: CharacteristicSetCallback): void {
+    // call On regardless of value
+
+    this.log.info('[%s] handleOnSet: value: %s', this.name, value);
+    if (value === true) {
+      this.device.sendTriggerSecondary();
+    }
+    callback(null);
+  }
+
+  handleOnGet(): void {
+    this.log.info('[%s] handleOnGet', this.name);
   }
 }
