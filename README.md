@@ -16,6 +16,9 @@
 ## Usage
 First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. The `Gate status sensor` is required for the plugin to work. 
 
+## New feature
+The secondary relay on Remootio-2 and Remootio-3 devices can now be seprately controlled via Homekit, after one of the outputs is configured as `free relay output` via the mobile app. Two new parameters have been added to the plugin configuration to enable and name the secondary relay.
+
 ## Installation
 
 If you are new to Homebridge, please first read the [Homebridge](https://homebridge.io) [documentation](https://github.com/homebridge/homebridge/wiki) and installation instructions before proceeding.
@@ -41,16 +44,20 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
         "name": "Remootio",
         "devices": [
             {
-                "name": "<name of the device you want to appear in HomeKit>",
+                "name": "<display name of the Garage Door Opener accessory you want to appear in HomeKit>",
                 "ipAddress": "<the ip address of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
-                "apiAuthKey": "<API Auth Key>"
+                "apiAuthKey": "<API Auth Key>",
+                "freeRelayOutput": <true/false>, // (defaults to false)
+                "secondaryName": "<display name of the Switch service in Homekit>" // (optional, defaults to "secondary")
             },
                 {
-                "name": "<name of the device you want to appear in HomeKit>",
+                "name": "<dispaly name of the Garage Door Opener accessory you want to appear in HomeKit>",
                 "ipAddress": "<the ip address of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
-                "apiAuthKey": "<API Auth Key>"
+                "apiAuthKey": "<API Auth Key>",
+                "freeRelayOutput": <true/false>, // (defaults to false)
+                "secondaryName": "<display name of the Switch service in Homekit>" // (optional, defaults to "secondary")
             },
         ]
     }
