@@ -43,6 +43,18 @@
                             "type": "string",
                             "required": true,
                             "default": ""
+                        },
+                        "freeRelayOutput": {
+                            "title": "Enable Free Relay Output",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false
+                        },
+                        "secondaryName": {
+                            "title": "Name of secondary relay",
+                            "type": "string",
+                            "required": false,
+                            "default": "Secondary"
                         }
                     }
                 }
