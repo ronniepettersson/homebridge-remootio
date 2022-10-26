@@ -112,6 +112,7 @@ export class RemootioHomebridgeAccessory {
   private ipAddress!: string;
   private apiSecretKey!: string;
   private apiAuthKey!: string;
+  private remootioVersion!: string;
   private pingInterval = 60000;
   private connectionAttempts = 0;
   private connectionAttemptLimit = 10;
@@ -218,7 +219,7 @@ export class RemootioHomebridgeAccessory {
         'Secondary Relay',
         'USER_DEFINED_SUBTYPE',
       );
-      secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.Name, config.secondaryName);
+      secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.secondaryName);
 
       secondaryRelayService
         .getCharacteristic(this.api.hap.Characteristic.On)
@@ -364,6 +365,7 @@ export class RemootioHomebridgeAccessory {
       serialNumber,
       remootioVersion,
     );
+    this.remootioVersion = remootioVersion;
     // Update the manufacturer information for this device.
     accessory
       .getService(this.hap.Service.AccessoryInformation)!
@@ -516,13 +518,19 @@ export class RemootioHomebridgeAccessory {
    *
    */
   handleOnSet(value: CharacteristicValue): void {
-    // call On regardless of value
-
-    this.log.info('[%s] handleOnSet: value: %s', this.name, value);
-    if (value === true) {
-      this.device.sendTriggerSecondary();
+    // call On if not remootio-1 and if value is true
+    if (this.remootioVersion !== 'remootio-1') {
+      this.log.info('[%s] handleOnSet: value: %s', this.name, value);
+      if (value === true) {
+        this.device.sendTriggerSecondary();
+      }
+    } else {
+      this.log.warn(
+        '[%s] Remotio version [%s] does not support secondary relay trigger',
+        this.name,
+        this.remootioVersion,
+      );
     }
-    //callback(null);
   }
 
   handleOnGet(): void {
