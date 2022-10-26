@@ -174,12 +174,14 @@ export class RemootioHomebridgeAccessory {
     // Add a new Remootio device using remootio-api-client library
     this.device = new RemootioDevice(this.ipAddress, this.apiSecretKey, this.apiAuthKey, this.pingInterval);
 
-    // Creating new Garage door opener service
-    const garageDoorService = accessory.getService(this.hap.Service.GarageDoorOpener);
-
     // Clear out stale services.
+    const garageDoorService = accessory.getService(this.hap.Service.GarageDoorOpener);
     if (garageDoorService) {
       accessory.removeService(garageDoorService);
+    }
+    const secondaryRelayService = accessory.getService('Secondary Relay');
+    if (secondaryRelayService) {
+      accessory.removeService(secondaryRelayService);
     }
 
     // Add the garage door opener service to the accessory.
