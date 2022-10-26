@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Homebridge plugin for Remootio",
   "main": "dist/index.js",
   "scripts": {
@@ -26,8 +26,8 @@
     "Homebridge"
   ],
   "engines": {
-    "homebridge": "^1.4.0",
-    "node": "^14.19.0 || ^16.15.1"
+    "homebridge": "^1.5.0",
+    "node": "^14.20.1 || ^16.18.0 || ^18.11.0"
   },
   "repository": {
     "type": "git",
