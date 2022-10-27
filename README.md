@@ -48,16 +48,16 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
                 "ipAddress": "<the ip address of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
                 "apiAuthKey": "<API Auth Key>",
-                "freeRelayOutput": <true/false>, // (defaults to false)
-                "secondaryName": "<display name of the Switch service in Homekit>" // (optional, defaults to "secondary")
+                "freeRelayOutput": false, // (change to true to enable secondary relay)
+                "secondaryName": "<optional, display name of the Switch service in Homekit>"
             },
                 {
                 "name": "<dispaly name of the Garage Door Opener accessory you want to appear in HomeKit>",
                 "ipAddress": "<the ip address of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
                 "apiAuthKey": "<API Auth Key>",
-                "freeRelayOutput": <true/false>, // (defaults to false)
-                "secondaryName": "<display name of the Switch service in Homekit>" // (optional, defaults to "secondary")
+                "freeRelayOutput": false, // (change to true to enable secondary relay)
+                "secondaryName": "<optional, display name of the Switch service in Homekit>" 
             },
         ]
     }
@@ -66,6 +66,6 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 ## Troubleshooting
 Most "No Response" issues are related to the device WebSocket API not being fully enabled, and therefore does not respond to API calls. To address this problem, use the Remootio mobile app to disable and then enable the WebSocket API. Thereafter, reboot the device.   
 
+## Screenshots
 
-
-
+![Open Gate in Apple Home app](/assets/OPEN_GATE.PNG) ![Closed Garage with optional relay switch in Apple Home app](/assets/GARAGE_W_OPTIONAL_RELAY.PNG)
