@@ -23,10 +23,9 @@
                             "default": "Remootio Accessory"
                         },
                         "ipAddress": {
-                            "title": "IP Address",
-                            "description": "The device's IP address. It is recommended to set a static IP for the device.",
+                            "title": "IP Address or Hostname",
+                            "description": "The device's IP address or hostname. It is recommended to set a static IP for the device.",
                             "type": "string",
-                            "format": "ipv4",
                             "required": true,
                             "default": "192.168.1.0"
                         },

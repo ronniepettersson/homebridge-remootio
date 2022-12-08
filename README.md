@@ -16,8 +16,10 @@
 ## Usage
 First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. The `Gate status sensor` is required for the plugin to work. 
 
-## New feature
-The secondary relay on Remootio-2 and Remootio-3 devices can now be seprately controlled via Homekit, after one of the outputs is configured as `free relay output` via the mobile app. Two new parameters have been added to the plugin configuration to enable and name the secondary relay.
+## Change log
+1.3.2 You can now specify the hostname of the Remootio device instead of the ip address.  
+
+1.3.1 The secondary relay on Remootio-2 and Remootio-3 devices can now be seprately controlled via Homekit, after one of the outputs is configured as `free relay output` via the mobile app. Two new parameters have been added to the plugin configuration to enable and name the secondary relay.
 
 ## Installation
 
@@ -45,7 +47,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
         "devices": [
             {
                 "name": "<display name of the Garage Door Opener accessory you want to appear in HomeKit>",
-                "ipAddress": "<the ip address of your Remootio device>",
+                "ipAddress": "<the ip address or hostname of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
                 "apiAuthKey": "<API Auth Key>",
                 "freeRelayOutput": false, // (change to true to enable secondary relay)
@@ -53,7 +55,7 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
             },
                 {
                 "name": "<dispaly name of the Garage Door Opener accessory you want to appear in HomeKit>",
-                "ipAddress": "<the ip address of your Remootio device>",
+                "ipAddress": "<the ip address or hostname of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
                 "apiAuthKey": "<API Auth Key>",
                 "freeRelayOutput": false, // (change to true to enable secondary relay)
@@ -65,6 +67,13 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
 ```
 ## Troubleshooting
 Most "No Response" issues are related to the device WebSocket API not being fully enabled, and therefore does not respond to API calls. To address this problem, use the Remootio mobile app to disable and then enable the WebSocket API. Thereafter, reboot the device.   
+
+## Discovering the hostname of my Remootio device
+The hostname of the Remootio device can be constructed by combining the string "remootio_", the serial number, and the local domain name. You can find the serial number of your device in the Remootio mobile app under Settings->Bluetooth information. It appears to be a combination of the Wi-Fi mac address and an unknown set of characters. 
+Another method is to use the "Discovery" app on an iOS device or a Mac and search for the _remootio._tcp service. In the corresponding information to your device serial numbers, you would find the hostname and IP address. 
+
+An example hostname would be: remootio_246f28abf4d1ctsyxnhs.local 
+
 
 ## Screenshots
 
