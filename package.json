@@ -47,9 +47,9 @@
     "@ronniepettersson/remootio-api-client": "^2.0.8"
   },
   "devDependencies": {
-    "@types/node": "^17.0.17",
-    "@typescript-eslint/eslint-plugin": "~5.11.0",
-    "@typescript-eslint/parser": "~5.11.0",
+    "@types/node": "^18.11.13",
+    "@typescript-eslint/eslint-plugin": "^5.46.0",
+    "@typescript-eslint/parser": "^5.46.0",
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -61,8 +61,8 @@
   "overrides": {
     "optimist": {
       ".": "^0.6.1",
-      "minimist":"^1.2.6" 
+      "minimist": "^1.2.6"
     },
-    "put":"https://registry.npmjs.org/@ronniepettersson/put/-/put-1.1.0.tgz"
+    "put": "https://registry.npmjs.org/@ronniepettersson/put/-/put-1.1.0.tgz"
   }
 }
