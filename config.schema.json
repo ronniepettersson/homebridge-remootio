@@ -43,6 +43,12 @@
                             "required": true,
                             "default": ""
                         },
+                        "noSensor": {
+                            "title": "Set to true if no sensor is installed",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false
+                        },
                         "freeRelayOutput": {
                             "title": "Enable Free Relay Output",
                             "type": "boolean",
