@@ -227,11 +227,7 @@ export class RemootioHomebridgeAccessory {
     if (config.enablePrimaryRelayOutput !== undefined && config.enablePrimaryRelayOutput === true) {
       this.enablePrimaryRelayOutput = true;
       this.primaryRelayName = config.primaryRelayName;
-      const primaryRelayService = accessory.addService(
-        this.api.hap.Service.Switch,
-        'Primary Relay',
-        'USER_DEFINED_SUBTYPE',
-      );
+      const primaryRelayService = accessory.addService(this.api.hap.Service.Switch, 'Primary Relay', 'PRIMARY_RELAY');
       primaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.primaryRelayName);
       primaryRelayService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.handlePrimarySet.bind(this));
       this.log.debug('[%s][%s] Primary Relay was added', this.name, this.primaryRelayName);
@@ -244,7 +240,7 @@ export class RemootioHomebridgeAccessory {
       const secondaryRelayService = accessory.addService(
         this.api.hap.Service.Switch,
         'Secondary Relay',
-        'USER_DEFINED_SUBTYPE',
+        'SECONDARY_RELAY',
       );
       secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.secondaryRelayName);
       secondaryRelayService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.handleSecondarySet.bind(this));
