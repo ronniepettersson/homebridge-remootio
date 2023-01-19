@@ -43,23 +43,29 @@
                             "required": true,
                             "default": ""
                         },
-                        "noSensor": {
-                            "title": "Set to true if no sensor is installed",
+                        "enablePrimaryRelayOutput": {
+                            "title": "Set to true if no sensor is installed. This will disable the garage door service on the primary relay ",
                             "type": "boolean",
                             "required": false,
                             "default": false
                         },
-                        "freeRelayOutput": {
-                            "title": "Enable Free Relay Output",
+                        "enableSecondaryRelayOutput": {
+                            "title": "Enable Free Relay Output on the secondary relay",
                             "type": "boolean",
                             "required": false,
                             "default": false
                         },
-                        "secondaryName": {
+                        "primaryRelayName": {
+                            "title": "Name of primary relay",
+                            "type": "string",
+                            "required": false,
+                            "default": "Primary Relay"
+                        },
+                        "secondaryRelayName": {
                             "title": "Name of secondary relay",
                             "type": "string",
                             "required": false,
-                            "default": "Secondary"
+                            "default": "Secondary Relay"
                         }
                     }
                 }

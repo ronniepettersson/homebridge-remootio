@@ -119,9 +119,10 @@ export class RemootioHomebridgeAccessory {
   private autoConnectFallbackTimeSeconds = 60;
   private autoConnectFallbackTimeoutHandle;
 
-  private freeRelayOutput = false;
-  private secondaryName!: string;
-  private noSensor = false;
+  private primaryRelayName!: string;
+  private secondaryRelayName!: string;
+  private enablePrimaryRelayOutput = false;
+  private enableSecondaryRelayOutput = false;
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
@@ -169,8 +170,8 @@ export class RemootioHomebridgeAccessory {
     this.apiSecretKey = config.apiSecretKey;
     this.apiAuthKey = config.apiAuthKey;
 
-    if (config.noSensor !== undefined && config.noSensor === true) {
-      this.noSensor = true;
+    if (config.enablePrimaryRelayOutput !== undefined && config.enablePrimaryRelayOutput === true) {
+      this.enablePrimaryRelayOutput = true;
     }
 
     this.log.debug('IP: ' + this.ipAddress);
@@ -194,59 +195,60 @@ export class RemootioHomebridgeAccessory {
       accessory.removeService(secondaryRelayService);
     }
 
-    // Add the garage door opener service to the accessory.
-    const garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
+    // Add garage door opener as long as primary replay is not enabled
+    if (!config.enablePrimaryRelayOutput) {
+      // Add the garage door opener service to the accessory.
+      const garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
 
-    // Registering the listeners for the required characteristics
-    // https://developers.homebridge.io/#/service/GarageDoorOpener
-    accessory
-      .addService(garageDoorOpenerService)
-      .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
-      .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
+      // Registering the listeners for the required characteristics
+      // https://developers.homebridge.io/#/service/GarageDoorOpener
+      accessory
+        .addService(garageDoorOpenerService)
+        .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
+        .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
-    accessory
-      .getService(this.hap.Service.GarageDoorOpener)!
-      .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
-      .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
-      .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
+      accessory
+        .getService(this.hap.Service.GarageDoorOpener)!
+        .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
+        .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
+        .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
 
-    accessory
-      .getService(this.hap.Service.GarageDoorOpener)!
-      .getCharacteristic(this.hap.Characteristic.ObstructionDetected)!
-      .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
-        // Dummy return as this is not supported by Remootio devices at this point
-        this.log.debug('[%s] ObstructionDetected was requested', this.name);
-        callback(null, false);
-      });
+      accessory
+        .getService(this.hap.Service.GarageDoorOpener)!
+        .getCharacteristic(this.hap.Characteristic.ObstructionDetected)!
+        .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+          // Dummy return as this is not supported by Remootio devices at this point
+          this.log.debug('[%s] ObstructionDetected was requested', this.name);
+          callback(null, false);
+        });
+    }
 
     // Add primary relay service
-    if (this.noSensor) {
+    if (config.enablePrimaryRelayOutput !== undefined && config.enablePrimaryRelayOutput === true) {
+      this.enablePrimaryRelayOutput = true;
+      this.primaryRelayName = config.primaryRelayName;
       const primaryRelayService = accessory.addService(
         this.api.hap.Service.Switch,
         'Primary Relay',
         'USER_DEFINED_SUBTYPE',
       );
-      primaryRelayService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.handleTriggerSet.bind(this));
-      this.log.debug('[%s] Primary Relay was added', this.name);
+      primaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.primaryRelayName);
+      primaryRelayService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.handlePrimarySet.bind(this));
+      this.log.debug('[%s][%s] Primary Relay was added', this.name, this.primaryRelayName);
     }
 
     // Add secondary relay service
-    if (config.freeRelayOutput !== undefined && config.freeRelayOutput === true) {
-      this.freeRelayOutput = true;
-      this.secondaryName = config.secondaryName;
+    if (config.enableSecondaryRelayOutput !== undefined && config.enableSecondaryRelayOutput === true) {
+      this.enableSecondaryRelayOutput = true;
+      this.secondaryRelayName = config.secondaryRelayName;
       const secondaryRelayService = accessory.addService(
         this.api.hap.Service.Switch,
         'Secondary Relay',
         'USER_DEFINED_SUBTYPE',
       );
-      secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.secondaryName);
-
-      secondaryRelayService
-        .getCharacteristic(this.api.hap.Characteristic.On)
-        //.onGet(this.handleOnGet.bind(this))
-        .onSet(this.handleOnSet.bind(this));
-
-      this.log.debug('[%s][%s] Secondary Relay was added', this.name, this.secondaryName);
+      secondaryRelayService.setCharacteristic(this.api.hap.Characteristic.ConfiguredName, config.secondaryRelayName);
+      secondaryRelayService.getCharacteristic(this.api.hap.Characteristic.On).onSet(this.handleSecondarySet.bind(this));
+      this.log.debug('[%s][%s] Secondary Relay was added', this.name, this.secondaryRelayName);
     }
 
     // Update the manufacturer information for this device.
@@ -554,8 +556,8 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the primary relay.
    *
    */
-  handleTriggerSet(value: CharacteristicValue): void {
-    this.log.info('[%s] handleOnSet: value: %s', this.name, value);
+  handlePrimarySet(value: CharacteristicValue): void {
+    this.log.info('[%s] handlePrimarySet: value: %s', this.name, value);
     if (value === true) {
       this.device.sendTrigger();
     }
@@ -565,10 +567,10 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the secondary relay.
    *
    */
-  handleOnSet(value: CharacteristicValue): void {
+  handleSecondarySet(value: CharacteristicValue): void {
     // call On if not remootio-1 and if value is true
     if (this.remootioVersion !== 'remootio-1') {
-      this.log.info('[%s] handleOnSet: value: %s', this.name, value);
+      this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
       if (value === true) {
         this.device.sendTriggerSecondary();
       }
