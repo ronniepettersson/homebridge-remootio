@@ -44,10 +44,10 @@
                             "default": ""
                         },
                         "garageDoorName": {
-                            "title": "Name of garage door",
+                            "title": "Name of garage door. Useful if you also use the secondary relay",
                             "type": "string",
                             "required": false,
-                            "default": "Garage Door"
+                            "default": ""
                         },                        
                         "enablePrimaryRelayOutput": {
                             "title": "Set to true if no sensor is installed. This will disable the garage door service on the primary relay ",

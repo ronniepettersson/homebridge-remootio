@@ -200,15 +200,15 @@ export class RemootioHomebridgeAccessory {
     // Add garage door opener as long as primary replay is not enabled
     if (!config.enablePrimaryRelayOutput) {
       // Add the garage door opener service to the accessory.
-      this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
+      if (config.garageDoorName !== undefined && config.garageDoorName !== '') {
+        this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(config.garageDoorName);
+      } else {
+        this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
+      }
 
       // Registering the listeners for the required characteristics
       // https://developers.homebridge.io/#/service/GarageDoorOpener
       accessory.addService(this.garageDoorOpenerService);
-
-      if (config.garageDoorName !== undefined) {
-        this.garageDoorOpenerService.setCharacteristic(this.api.hap.Characteristic.Name, config.garageDoorName);
-      }
 
       this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
