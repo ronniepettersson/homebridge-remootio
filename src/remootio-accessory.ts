@@ -332,8 +332,13 @@ export class RemootioHomebridgeAccessory {
         // we're syncing current and target states when we receive a StateChange event.
         if (decryptedPayload.event.type === 'StateChange') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          this.setCurrentDoorState(decryptedPayload.event.state);
-          this.setTargetDoorState(decryptedPayload.event.state);
+          if (this.garageDoorOpenerService) {
+            this.setCurrentDoorState(decryptedPayload.event.state);
+            this.setTargetDoorState(decryptedPayload.event.state);
+          }
+          if (this.enablePrimaryRelayOutput) {
+            this.setPrimaryRelayState(false);
+          }
         }
         // SecondaryRelayTrigger
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger') {
