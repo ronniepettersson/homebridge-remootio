@@ -187,22 +187,28 @@ export class RemootioHomebridgeAccessory {
     const garageDoorService = accessory.getService(this.hap.Service.GarageDoorOpener);
     if (garageDoorService) {
       accessory.removeService(garageDoorService);
+      this.log.debug('[%s] Removing garageDoorService', this.name);
     }
+
     const primaryRelayService = accessory.getService('Primary Relay');
     if (primaryRelayService) {
       accessory.removeService(primaryRelayService);
+      this.log.debug('[%s] Removing primaryRelayService', this.name);
     }
     const secondaryRelayService = accessory.getService('Secondary Relay');
     if (secondaryRelayService) {
       accessory.removeService(secondaryRelayService);
+      this.log.debug('[%s] Removing secondaryRelayService', this.name);
     }
 
     // Add garage door opener as long as primary replay is not enabled
     if (!config.enablePrimaryRelayOutput) {
       // Add the garage door opener service to the accessory.
       if (config.garageDoorName !== undefined && config.garageDoorName !== '') {
+        this.log.debug('[%s] Setting garageDoorService name to [%s]', this.name, config.garageDoorName);
         this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(config.garageDoorName);
       } else {
+        this.log.debug('[%s] Setting garageDoorService name same as accessory name', this.name);
         this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
       }
 
