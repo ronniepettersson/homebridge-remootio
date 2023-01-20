@@ -43,6 +43,12 @@
                             "required": true,
                             "default": ""
                         },
+                        "garageDoorName": {
+                            "title": "Name of garage door",
+                            "type": "string",
+                            "required": false,
+                            "default": "Garage Door"
+                        },                        
                         "enablePrimaryRelayOutput": {
                             "title": "Set to true if no sensor is installed. This will disable the garage door service on the primary relay ",
                             "type": "boolean",

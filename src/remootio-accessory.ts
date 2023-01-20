@@ -120,8 +120,6 @@ export class RemootioHomebridgeAccessory {
   private autoConnectFallbackTimeSeconds = 60;
   private autoConnectFallbackTimeoutHandle;
 
-  private primaryRelayName!: string;
-  private secondaryRelayName!: string;
   private enablePrimaryRelayOutput = false;
   private enableSecondaryRelayOutput = false;
 
@@ -208,6 +206,10 @@ export class RemootioHomebridgeAccessory {
       // https://developers.homebridge.io/#/service/GarageDoorOpener
       accessory.addService(this.garageDoorOpenerService);
 
+      if (config.garageDoorName !== undefined) {
+        this.garageDoorOpenerService.setCharacteristic(this.api.hap.Characteristic.Name, config.garageDoorName);
+      }
+
       this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
         .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
@@ -229,19 +231,17 @@ export class RemootioHomebridgeAccessory {
     // Add primary relay service
     if (config.enablePrimaryRelayOutput !== undefined && config.enablePrimaryRelayOutput === true) {
       this.enablePrimaryRelayOutput = true;
-      this.primaryRelayName = config.primaryRelayName;
       this.primaryRelayService = accessory.addService(this.api.hap.Service.Switch, 'Primary Relay', 'PRIMARY_RELAY');
       this.primaryRelayService.setCharacteristic(this.api.hap.Characteristic.Name, config.primaryRelayName);
       this.primaryRelayService
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(this.handlePrimarySet.bind(this));
-      this.log.debug('[%s][%s] Primary Relay was added', this.name, this.primaryRelayName);
+      this.log.debug('[%s][%s] Primary Relay was added', this.name, config.primaryRelayName);
     }
 
     // Add secondary relay service
     if (config.enableSecondaryRelayOutput !== undefined && config.enableSecondaryRelayOutput === true) {
       this.enableSecondaryRelayOutput = true;
-      this.secondaryRelayName = config.secondaryRelayName;
       this.secondaryRelayService = accessory.addService(
         this.api.hap.Service.Switch,
         'Secondary Relay',
@@ -251,7 +251,7 @@ export class RemootioHomebridgeAccessory {
       this.secondaryRelayService
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(this.handleSecondarySet.bind(this));
-      this.log.debug('[%s][%s] Secondary Relay was added', this.name, this.secondaryRelayName);
+      this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
 
     // Update the manufacturer information for this device.
@@ -341,7 +341,7 @@ export class RemootioHomebridgeAccessory {
           }
         }
         // SecondaryRelayTrigger
-        if (decryptedPayload.event.type === 'SecondaryRelayTrigger') {
+        if (decryptedPayload.event.type === 'SecondaryRelayTrigger' && this.enableSecondaryRelayOutput === true) {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           this.setSecondaryRelayState(false);
         }
