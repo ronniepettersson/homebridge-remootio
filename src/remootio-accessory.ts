@@ -345,7 +345,7 @@ export class RemootioHomebridgeAccessory {
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
         if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          if (decryptedPayload.event.state === 'no sensor') {
+          if (this.enablePrimaryRelayOutput) {
             this.setPrimaryRelayState(false);
           } else {
             if (decryptedPayload.event.state === 'open') {
