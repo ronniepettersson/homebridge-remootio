@@ -136,7 +136,7 @@ export class RemootioHomebridgeAccessory {
   private lastIncoming100ms = 0;
   private readonly t100msDelay = 500;
 
-  //private garageDoorOpenerService!: Service;
+  private garageDoorOpenerService!: Service;
   //private informationService!: Service;
 
   // The constructor initializes variables
@@ -202,23 +202,22 @@ export class RemootioHomebridgeAccessory {
     // Add garage door opener as long as primary replay is not enabled
     if (!config.enablePrimaryRelayOutput) {
       // Add the garage door opener service to the accessory.
-      const garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
+      this.garageDoorOpenerService = new this.hap.Service.GarageDoorOpener(this.name);
 
       // Registering the listeners for the required characteristics
       // https://developers.homebridge.io/#/service/GarageDoorOpener
-      accessory
-        .addService(garageDoorOpenerService)
+      accessory.addService(this.garageDoorOpenerService);
+
+      this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
         .on(CharacteristicEventTypes.GET, this.getCurrentStateHandler.bind(this));
 
-      accessory
-        .getService(this.hap.Service.GarageDoorOpener)!
+      this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.TargetDoorState)!
         .on(CharacteristicEventTypes.GET, this.getTargetStateHandler.bind(this))
         .on(CharacteristicEventTypes.SET, this.setTargetStateHandler.bind(this));
 
-      accessory
-        .getService(this.hap.Service.GarageDoorOpener)!
+      this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.ObstructionDetected)!
         .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
           // Dummy return as this is not supported by Remootio devices at this point
@@ -339,7 +338,7 @@ export class RemootioHomebridgeAccessory {
         // SecondaryRelayTrigger
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          this.setSecondRelayState(false);
+          this.setSecondaryRelayState(false);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
@@ -362,7 +361,15 @@ export class RemootioHomebridgeAccessory {
           decryptedPayload.response.type === 'QUERY' &&
           decryptedPayload.response.t100ms - this.lastIncoming100ms > this.t100msDelay // wait xx ms before accepting a new state
         ) {
-          this.setCurrentDoorState(decryptedPayload.response.state);
+          if (this.garageDoorOpenerService) {
+            this.setCurrentDoorState(decryptedPayload.response.state);
+          }
+          if (this.primaryRelayService) {
+            this.setPrimaryRelayState(false);
+          }
+          if (this.secondaryRelayService) {
+            this.setSecondaryRelayState(false);
+          }
         }
       }
     } else {
@@ -470,7 +477,7 @@ export class RemootioHomebridgeAccessory {
     }
   }
 
-  setSecondRelayState(state: boolean) {
+  setSecondaryRelayState(state: boolean) {
     //const accessory = this.accessory;
     const characteristics = this.secondaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
 
