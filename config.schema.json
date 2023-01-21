@@ -50,7 +50,7 @@
                             "default": ""
                         },                        
                         "enablePrimaryRelayOutput": {
-                            "title": "Set to true if no sensor is installed. This will disable the garage door service on the primary relay ",
+                            "title": "Enable if you want to use the primary relay as a generic trigger. This will disable the garage door service on the primary relay ",
                             "type": "boolean",
                             "required": false,
                             "default": false

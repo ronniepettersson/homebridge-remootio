@@ -11,12 +11,16 @@
 
 
 
-[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports <B>Remootio 1</B>, <B>Remootio 2</B> and <B>Remootio 3</B> with software version >=2.23 that provides the new [V2 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v2_specification.md).
+[Homebridge](https://homebridge.io) Plugin Providing [Remootio](https://www.remootio.com/) Support. This plugin supports <B>Remootio 1</B>, <B>Remootio 2</B> and <B>Remootio 3</B> with software versions >=2.24 that provide the [V3 API](https://github.com/remootio/remootio-api-documentation/blob/master/websocket_api_v3_specification.md). 
 
 ## Usage
-First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. The `Gate status sensor` is required for the plugin to work. 
+First of all make sure that the Remootio Websocket API is enabled `with logging` for your Remootio device in the Remootio app. Please take note of the API Secret Key and API Auth Key along with the IP address of the device, as you will need these. 
+
+The `Gate status sensor` is required for the plugin to appear as a Garage Door Opener in HomeKit. If you don't use, or have the gate status sensor, the plugin will appear as a Switch. For remootio-2 and remootio-3 devices, you can also expose the secondary relay as Switch. 
 
 ## Change log
+1.3.4 You can now configure the primary relay as a generic relay. This is useful if you don't have the sensor to indicate if a garage door or gate is open or closed. 
+
 1.3.2 You can now specify the hostname of the Remootio device instead of the ip address.  
 
 1.3.1 The secondary relay on Remootio-2 and Remootio-3 devices can now be seprately controlled via Homekit, after one of the outputs is configured as `free relay output` via the mobile app. Two new parameters have been added to the plugin configuration to enable and name the secondary relay.
@@ -50,16 +54,22 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
                 "ipAddress": "<the ip address or hostname of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
                 "apiAuthKey": "<API Auth Key>",
-                "freeRelayOutput": false, // (change to true to enable secondary relay)
-                "secondaryName": "<optional, display name of the Switch service in Homekit>"
+                "garageDoorName": "Garage Door",
+                "enablePrimaryRelayOutput": false,
+                "enableSecondaryRelayOutput": true,
+                "primaryRelayName": "Primary Relay",
+                "secondaryRelayName": "Secondary Relay"
+            
             },
                 {
-                "name": "<dispaly name of the Garage Door Opener accessory you want to appear in HomeKit>",
+                "name": "<display name of the Garage Door Opener accessory you want to appear in HomeKit>",
                 "ipAddress": "<the ip address or hostname of your Remootio device>",
                 "apiSecretKey": "<API Secret Key>",
-                "apiAuthKey": "<API Auth Key>",
-                "freeRelayOutput": false, // (change to true to enable secondary relay)
-                "secondaryName": "<optional, display name of the Switch service in Homekit>" 
+                "garageDoorName": "Garage Door",
+                "enablePrimaryRelayOutput": false,
+                "enableSecondaryRelayOutput": true,
+                "primaryRelayName": "Primary Relay",
+                "secondaryRelayName": "Secondary Relay"
             },
         ]
     }
