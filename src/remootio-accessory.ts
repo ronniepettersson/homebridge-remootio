@@ -190,15 +190,15 @@ export class RemootioHomebridgeAccessory {
       this.log.debug('[%s] Removing garageDoorService', this.name);
     }
 
-    const primaryRelayService = accessory.getService('Primary Relay');
+    const primaryRelayService = accessory.getService('PRIMARY_RELAY');
     if (primaryRelayService) {
+      this.log.debug('[%s][%s] Removing primaryRelayService', this.name, primaryRelayService.displayName);
       accessory.removeService(primaryRelayService);
-      this.log.debug('[%s] Removing primaryRelayService', this.name);
     }
-    const secondaryRelayService = accessory.getService('Secondary Relay');
+    const secondaryRelayService = accessory.getService('SECONDARY_RELAY');
     if (secondaryRelayService) {
+      this.log.debug('[%s][%s] Removing secondaryRelayService', this.name, secondaryRelayService.displayName);
       accessory.removeService(secondaryRelayService);
-      this.log.debug('[%s] Removing secondaryRelayService', this.name);
     }
 
     // Add garage door opener as long as primary replay is not enabled
