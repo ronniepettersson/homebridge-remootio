@@ -601,7 +601,7 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the secondary relay.
    *
    */
-  handleSecondarySet(value: CharacteristicValue): void {
+  handleSecondarySet(value: CharacteristicValue, callback: CharacteristicGetCallback): void {
     // call On if not remootio-1 and if value is true
     if (this.remootioVersion !== 'remootio-1') {
       this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
@@ -619,6 +619,7 @@ export class RemootioHomebridgeAccessory {
         this.remootioVersion,
       );
     }
+    callback(null);
   }
 
   handlePrimaryGet(callback: CharacteristicGetCallback): void {
