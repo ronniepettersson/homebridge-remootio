@@ -555,7 +555,7 @@ export class RemootioHomebridgeAccessory {
     if (value) {
       this.device.sendTrigger();
       this.primaryRelayState = true;
-      this.primaryTimer = setTimeout(this.primaryTimeoutFunction.bind(this), 1000);
+      this.primaryTimer = setTimeout(this.primaryTimeoutFunction.bind(this), 750);
     } else {
       this.primaryRelayState = false;
     }
@@ -579,7 +579,7 @@ export class RemootioHomebridgeAccessory {
       if (value) {
         this.device.sendTriggerSecondary();
         this.secondaryRelayState = true;
-        this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 1000);
+        this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 750);
       } else {
         this.secondaryRelayState = false;
       }
