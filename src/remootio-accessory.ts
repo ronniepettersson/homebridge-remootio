@@ -101,7 +101,6 @@ const garageDoorOpenerStateToString: string[] = ['OPEN', 'CLOSED', 'OPENING', 'C
 
 export class RemootioHomebridgeAccessory {
   private readonly log: Logging;
-  private readonly api: API;
   private readonly hap: HAP;
   private readonly accessory: PlatformAccessory;
   private readonly platform: RemootioPlatform;
@@ -141,8 +140,7 @@ export class RemootioHomebridgeAccessory {
 
   constructor(platform: RemootioPlatform, accessory: PlatformAccessory) {
     this.accessory = accessory;
-    this.api = platform.api;
-    this.hap = this.api.hap;
+    this.hap = platform.api.hap;
     this.log = platform.log;
     this.platform = platform;
 
@@ -240,9 +238,9 @@ export class RemootioHomebridgeAccessory {
       this.primaryRelayService = new this.hap.Service.Switch(config.primaryRelayName, 'PRIMARY_RELAY');
       accessory.addService(this.primaryRelayService);
       this.primaryRelayService
-        .getCharacteristic(this.api.hap.Characteristic.On)
-        .onSet(this.handlePrimarySet.bind(this));
-      this.primaryRelayService.updateCharacteristic(this.api.hap.Characteristic.Name, config.primaryRelayName);
+        .getCharacteristic(this.hap.Characteristic.On)
+        .on('set', this.handlePrimarySet.bind(this));
+      this.primaryRelayService.updateCharacteristic(this.hap.Characteristic.Name, config.primaryRelayName);
       this.log.debug('[%s][%s] Primary Relay was added', this.name, config.primaryRelayName);
     }
 
@@ -252,9 +250,9 @@ export class RemootioHomebridgeAccessory {
       this.secondaryRelayService = new this.hap.Service.Switch(config.secondaryRelayName, 'SECONDARY_RELAY');
       accessory.addService(this.secondaryRelayService);
       this.secondaryRelayService
-        .getCharacteristic(this.api.hap.Characteristic.On)
-        .onSet(this.handleSecondarySet.bind(this));
-      this.secondaryRelayService.updateCharacteristic(this.api.hap.Characteristic.Name, config.secondaryRelayName);
+        .getCharacteristic(this.hap.Characteristic.On)
+        .on('set', this.handleSecondarySet.bind(this));
+      this.secondaryRelayService.updateCharacteristic(this.hap.Characteristic.Name, config.secondaryRelayName);
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
 
@@ -591,8 +589,10 @@ export class RemootioHomebridgeAccessory {
     // call On if not remootio-1 and if value is true
     if (this.remootioVersion !== 'remootio-1') {
       this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
-      if (value === true) {
+      if (value) {
         this.device.sendTriggerSecondary();
+      } else {
+        this.log.debug('[%s] Secondary relay off', this.name);
       }
     } else {
       this.log.warn(
