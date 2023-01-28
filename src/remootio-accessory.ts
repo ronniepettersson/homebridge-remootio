@@ -134,7 +134,7 @@ export class RemootioHomebridgeAccessory {
   private targetState = -1;
   private lastIncoming100ms = 0;
   private readonly t100msDelay = 500;
-  //private secondaryTimer: ReturnType<typeof setTimeout>;
+  private secondaryTimer: any = null;
 
   private garageDoorOpenerService!: Service;
   //private informationService!: Service;
@@ -499,7 +499,7 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] Setting secondary relay state to true', this.name);
       //characteristics.updateValue(true);
       this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
-      setTimeout(this.secondaryTimeoutFunction, 2000);
+      this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 2000);
     } else {
       this.log.info('[%s] Setting secondary relay state to false', this.name);
       //characteristics.updateValue(false);
