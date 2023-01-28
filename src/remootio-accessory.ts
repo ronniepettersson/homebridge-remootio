@@ -349,9 +349,6 @@ export class RemootioHomebridgeAccessory {
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger' && this.enableSecondaryRelayOutput === true) {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           //this.setSecondaryRelayState(true);
-          setTimeout(() => {
-            this.setSecondaryRelayState(false);
-          }, 1000);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
@@ -496,6 +493,10 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] Setting secondary relay state to true', this.name);
       //characteristics.updateValue(true);
       this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
+      setTimeout(() => {
+        this.setSecondaryRelayState(false);
+        this.log.debug('[%s] Secondary Relay Timer expired', this.name);
+      }, 2000);
     } else {
       this.log.info('[%s] Setting secondary relay state to false', this.name);
       //characteristics.updateValue(false);
