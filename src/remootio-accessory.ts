@@ -134,6 +134,7 @@ export class RemootioHomebridgeAccessory {
   private targetState = -1;
   private lastIncoming100ms = 0;
   private readonly t100msDelay = 500;
+  //private secondaryTimer: ReturnType<typeof setTimeout>;
 
   private garageDoorOpenerService!: Service;
   //private informationService!: Service;
@@ -356,9 +357,6 @@ export class RemootioHomebridgeAccessory {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           if (this.enablePrimaryRelayOutput) {
             //this.setPrimaryRelayState(true);
-            setTimeout(() => {
-              this.setPrimaryRelayState(false);
-            }, 1000);
           } else {
             if (decryptedPayload.event.state === 'open') {
               this.setCurrentDoorState('closing');
@@ -479,11 +477,19 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] Setting primary relay state to true', this.name);
       //characteristics.updateValue(true);
       this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
+      setTimeout(() => {
+        this.setPrimaryRelayState(false);
+      }, 1000);
     } else {
       this.log.info('[%s] Setting primary relay state to false', this.name);
       //characteristics.updateValue(false);
       this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
     }
+  }
+
+  secondaryTimeoutFunction() {
+    this.log.info('[%s] Secondary Relay Timer expired', this.name);
+    this.setSecondaryRelayState(false);
   }
 
   setSecondaryRelayState(state: boolean) {
@@ -493,10 +499,7 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] Setting secondary relay state to true', this.name);
       //characteristics.updateValue(true);
       this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
-      setTimeout(() => {
-        this.setSecondaryRelayState(false);
-        this.log.debug('[%s] Secondary Relay Timer expired', this.name);
-      }, 2000);
+      setTimeout(this.secondaryTimeoutFunction, 2000);
     } else {
       this.log.info('[%s] Setting secondary relay state to false', this.name);
       //characteristics.updateValue(false);
