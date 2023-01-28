@@ -134,6 +134,7 @@ export class RemootioHomebridgeAccessory {
   private targetState = -1;
   private lastIncoming100ms = 0;
   private readonly t100msDelay = 500;
+  private primaryTimer: any = null;
   private secondaryTimer: any = null;
 
   private garageDoorOpenerService!: Service;
@@ -343,20 +344,18 @@ export class RemootioHomebridgeAccessory {
             this.setTargetDoorState(decryptedPayload.event.state);
           }
           if (this.enablePrimaryRelayOutput) {
-            this.setPrimaryRelayState(false);
+            //this.setPrimaryRelayState(false);
           }
         }
         // SecondaryRelayTrigger
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger' && this.enableSecondaryRelayOutput === true) {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          //this.setSecondaryRelayState(true);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
         if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           if (this.enablePrimaryRelayOutput) {
-            //this.setPrimaryRelayState(true);
           } else {
             if (decryptedPayload.event.state === 'open') {
               this.setCurrentDoorState('closing');
@@ -469,45 +468,6 @@ export class RemootioHomebridgeAccessory {
     }
   }
 
-  setPrimaryRelayState(state: boolean) {
-    //const accessory = this.accessory;
-    //const characteristics = this.primaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
-
-    if (state) {
-      this.log.info('[%s] Setting primary relay state to true', this.name);
-      //characteristics.updateValue(true);
-      this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
-      setTimeout(() => {
-        this.setPrimaryRelayState(false);
-      }, 1000);
-    } else {
-      this.log.info('[%s] Setting primary relay state to false', this.name);
-      //characteristics.updateValue(false);
-      this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
-    }
-  }
-
-  secondaryTimeoutFunction() {
-    this.log.info('[%s] Secondary Relay Timer expired', this.name);
-    //this.setSecondaryRelayState(false);
-    this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
-  }
-
-  setSecondaryRelayState(state: boolean) {
-    //const accessory = this.accessory;
-    //const characteristics = this.secondaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
-    if (state) {
-      this.log.info('[%s] Setting secondary relay state to true', this.name);
-      //characteristics.updateValue(true);
-      this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
-      this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 2000);
-    } else {
-      this.log.info('[%s] Setting secondary relay state to false', this.name);
-      //characteristics.updateValue(false);
-      this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
-    }
-  }
-
   getCurrentStateHandler(callback: CharacteristicGetCallback): void {
     this.log.debug(
       '[%s] getCurrentStateHandler: Current door state: [%s]',
@@ -581,20 +541,31 @@ export class RemootioHomebridgeAccessory {
     callback(null);
   }
 
+  primaryTimeoutFunction() {
+    this.log.info('[%s] Primary Relay Timer expired', this.name);
+    this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
+  }
+
   /*
    * This method implements the logic for sending a trigger to the primary relay.
    *
    */
-  handlePrimarySet(value: CharacteristicValue): void {
+  handlePrimarySet(value: CharacteristicValue, callback: CharacteristicGetCallback): void {
     this.log.info('[%s] handlePrimarySet: value: %s', this.name, value);
     if (value) {
       this.device.sendTrigger();
-      //this.primaryRelayState = true;
+      this.primaryRelayState = true;
+      this.primaryTimer = setTimeout(this.primaryTimeoutFunction.bind(this), 1000);
     } else {
-      //this.log.debug('[%s] Primary relay off', this.name);
-      //this.primaryRelayState = false;
+      this.primaryRelayState = false;
     }
     //this.setPrimaryRelayState(this.primaryRelayState);
+    callback(null);
+  }
+
+  secondaryTimeoutFunction() {
+    this.log.info('[%s] Secondary Relay Timer expired', this.name);
+    this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
   }
 
   /*
@@ -608,7 +579,7 @@ export class RemootioHomebridgeAccessory {
       if (value) {
         this.device.sendTriggerSecondary();
         this.secondaryRelayState = true;
-        this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 2000);
+        this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 1000);
       } else {
         this.secondaryRelayState = false;
       }
@@ -630,9 +601,5 @@ export class RemootioHomebridgeAccessory {
   handleSecondaryGet(callback: CharacteristicGetCallback): void {
     this.log.info('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
     callback(null, this.secondaryRelayState);
-  }
-
-  handleOnGet(): void {
-    this.log.info('[%s] handleOnGet', this.name);
   }
 }
