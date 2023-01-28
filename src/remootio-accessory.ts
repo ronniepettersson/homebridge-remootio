@@ -348,14 +348,20 @@ export class RemootioHomebridgeAccessory {
         // SecondaryRelayTrigger
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger' && this.enableSecondaryRelayOutput === true) {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          this.setSecondaryRelayState(false);
+          this.setSecondaryRelayState(true);
+          setTimeout(() => {
+            this.setSecondaryRelayState(false);
+          }, 1000);
         }
         // If the command is triggered via api key, it comes from homebridge.
         // Here we are setting the current door state to opening or closing, if there is a relay trigger event.
         if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           if (this.enablePrimaryRelayOutput) {
-            this.setPrimaryRelayState(false);
+            this.setPrimaryRelayState(true);
+            setTimeout(() => {
+              this.setPrimaryRelayState(false);
+            }, 1000);
           } else {
             if (decryptedPayload.event.state === 'open') {
               this.setCurrentDoorState('closing');
@@ -373,12 +379,6 @@ export class RemootioHomebridgeAccessory {
         ) {
           if (this.garageDoorOpenerService) {
             this.setCurrentDoorState(decryptedPayload.response.state);
-          }
-          if (this.primaryRelayService) {
-            this.setPrimaryRelayState(false);
-          }
-          if (this.secondaryRelayService) {
-            this.setSecondaryRelayState(false);
           }
         }
       }
@@ -584,12 +584,12 @@ export class RemootioHomebridgeAccessory {
     this.log.info('[%s] handlePrimarySet: value: %s', this.name, value);
     if (value) {
       this.device.sendTrigger();
-      this.primaryRelayState = true;
+      //this.primaryRelayState = true;
     } else {
-      this.log.debug('[%s] Primary relay off', this.name);
-      this.primaryRelayState = false;
+      //this.log.debug('[%s] Primary relay off', this.name);
+      //this.primaryRelayState = false;
     }
-    this.setPrimaryRelayState(this.primaryRelayState);
+    //this.setPrimaryRelayState(this.primaryRelayState);
   }
 
   /*
@@ -602,12 +602,10 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
       if (value) {
         this.device.sendTriggerSecondary();
-        this.secondaryRelayState = true;
       } else {
-        this.log.debug('[%s] Secondary relay off', this.name);
-        this.secondaryRelayState = false;
+        //this.secondaryRelayState = false;
       }
-      this.setSecondaryRelayState(this.secondaryRelayState);
+      //this.setSecondaryRelayState(this.secondaryRelayState);
     } else {
       this.log.warn(
         '[%s] Remotio version [%s] does not support secondary relay trigger',
