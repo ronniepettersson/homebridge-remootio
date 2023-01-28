@@ -348,7 +348,7 @@ export class RemootioHomebridgeAccessory {
         // SecondaryRelayTrigger
         if (decryptedPayload.event.type === 'SecondaryRelayTrigger' && this.enableSecondaryRelayOutput === true) {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
-          this.setSecondaryRelayState(true);
+          //this.setSecondaryRelayState(true);
           setTimeout(() => {
             this.setSecondaryRelayState(false);
           }, 1000);
@@ -358,7 +358,7 @@ export class RemootioHomebridgeAccessory {
         if (decryptedPayload.event.type === 'RelayTrigger' && decryptedPayload.event.data?.keyType === 'api key') {
           this.lastIncoming100ms = decryptedPayload.event.t100ms;
           if (this.enablePrimaryRelayOutput) {
-            this.setPrimaryRelayState(true);
+            //this.setPrimaryRelayState(true);
             setTimeout(() => {
               this.setPrimaryRelayState(false);
             }, 1000);
@@ -602,10 +602,10 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
       if (value) {
         this.device.sendTriggerSecondary();
+        this.secondaryRelayState = true;
       } else {
-        //this.secondaryRelayState = false;
+        this.secondaryRelayState = false;
       }
-      //this.setSecondaryRelayState(this.secondaryRelayState);
     } else {
       this.log.warn(
         '[%s] Remotio version [%s] does not support secondary relay trigger',
