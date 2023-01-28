@@ -586,6 +586,7 @@ export class RemootioHomebridgeAccessory {
       this.log.debug('[%s] Primary relay off', this.name);
       this.primaryRelayState = false;
     }
+    this.setPrimaryRelayState(this.primaryRelayState);
   }
 
   /*
@@ -603,6 +604,7 @@ export class RemootioHomebridgeAccessory {
         this.log.debug('[%s] Secondary relay off', this.name);
         this.secondaryRelayState = false;
       }
+      this.setSecondaryRelayState(this.secondaryRelayState);
     } else {
       this.log.warn(
         '[%s] Remotio version [%s] does not support secondary relay trigger',
@@ -613,12 +615,12 @@ export class RemootioHomebridgeAccessory {
   }
 
   handlePrimaryGet(callback: CharacteristicGetCallback): void {
-    this.log.info('[%s] handlePrimaryGet', this.name);
+    this.log.info('[%s] handlePrimaryGet: value: %s', this.name, this.primaryRelayState);
     callback(null, this.primaryRelayState);
   }
 
   handleSecondaryGet(callback: CharacteristicGetCallback): void {
-    this.log.info('[%s] handleSecondaryGet', this.name);
+    this.log.info('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
     callback(null, this.secondaryRelayState);
   }
 
