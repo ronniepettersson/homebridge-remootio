@@ -476,27 +476,30 @@ export class RemootioHomebridgeAccessory {
 
   setPrimaryRelayState(state: boolean) {
     //const accessory = this.accessory;
-    const characteristics = this.primaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
+    //const characteristics = this.primaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
 
     if (state) {
       this.log.info('[%s] Setting primary relay state to true', this.name);
-      characteristics.updateValue(true);
+      //characteristics.updateValue(true);
+      this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
     } else {
       this.log.info('[%s] Setting primary relay state to false', this.name);
-      characteristics.updateValue(false);
+      //characteristics.updateValue(false);
+      this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
     }
   }
 
   setSecondaryRelayState(state: boolean) {
     //const accessory = this.accessory;
-    const characteristics = this.secondaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
-
+    //const characteristics = this.secondaryRelayService!.getCharacteristic(this.hap.Characteristic.On);
     if (state) {
       this.log.info('[%s] Setting secondary relay state to true', this.name);
-      characteristics.updateValue(true);
+      //characteristics.updateValue(true);
+      this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, true);
     } else {
       this.log.info('[%s] Setting secondary relay state to false', this.name);
-      characteristics.updateValue(false);
+      //characteristics.updateValue(false);
+      this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
     }
   }
 
