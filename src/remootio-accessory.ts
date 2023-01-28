@@ -489,7 +489,8 @@ export class RemootioHomebridgeAccessory {
 
   secondaryTimeoutFunction() {
     this.log.info('[%s] Secondary Relay Timer expired', this.name);
-    this.setSecondaryRelayState(false);
+    //this.setSecondaryRelayState(false);
+    this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
   }
 
   setSecondaryRelayState(state: boolean) {
@@ -607,6 +608,7 @@ export class RemootioHomebridgeAccessory {
       if (value) {
         this.device.sendTriggerSecondary();
         this.secondaryRelayState = true;
+        this.secondaryTimer = setTimeout(this.secondaryTimeoutFunction.bind(this), 2000);
       } else {
         this.secondaryRelayState = false;
       }
