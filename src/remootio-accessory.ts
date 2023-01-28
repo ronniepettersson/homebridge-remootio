@@ -127,6 +127,8 @@ export class RemootioHomebridgeAccessory {
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
+  private primaryRelayState = false;
+  private secondaryRelayState = false;
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
@@ -251,7 +253,8 @@ export class RemootioHomebridgeAccessory {
       accessory.addService(this.secondaryRelayService);
       this.secondaryRelayService
         .getCharacteristic(this.hap.Characteristic.On)
-        .on('set', this.handleSecondarySet.bind(this));
+        .on('set', this.handleSecondarySet.bind(this))
+        .on('get', this.handleSecondaryGet.bind(this));
       this.secondaryRelayService.updateCharacteristic(this.hap.Characteristic.Name, config.secondaryRelayName);
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
@@ -576,8 +579,12 @@ export class RemootioHomebridgeAccessory {
    */
   handlePrimarySet(value: CharacteristicValue): void {
     this.log.info('[%s] handlePrimarySet: value: %s', this.name, value);
-    if (value === true) {
+    if (value) {
       this.device.sendTrigger();
+      this.primaryRelayState = true;
+    } else {
+      this.log.debug('[%s] Primary relay off', this.name);
+      this.primaryRelayState = false;
     }
   }
 
@@ -591,8 +598,10 @@ export class RemootioHomebridgeAccessory {
       this.log.info('[%s] handleSecondarySet: value: %s', this.name, value);
       if (value) {
         this.device.sendTriggerSecondary();
+        this.secondaryRelayState = true;
       } else {
         this.log.debug('[%s] Secondary relay off', this.name);
+        this.secondaryRelayState = false;
       }
     } else {
       this.log.warn(
@@ -601,6 +610,16 @@ export class RemootioHomebridgeAccessory {
         this.remootioVersion,
       );
     }
+  }
+
+  handlePrimaryGet(callback: CharacteristicGetCallback): void {
+    this.log.info('[%s] handlePrimaryGet', this.name);
+    callback(null, this.primaryRelayState);
+  }
+
+  handleSecondaryGet(callback: CharacteristicGetCallback): void {
+    this.log.info('[%s] handleSecondaryGet', this.name);
+    callback(null, this.secondaryRelayState);
   }
 
   handleOnGet(): void {
