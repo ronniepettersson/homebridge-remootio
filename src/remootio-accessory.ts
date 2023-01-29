@@ -216,7 +216,7 @@ export class RemootioHomebridgeAccessory {
 
       // Registering the listeners for the required characteristics
       // https://developers.homebridge.io/#/service/GarageDoorOpener
-      accessory.addService(this.garageDoorOpenerService);
+      accessory.addService(this.garageDoorOpenerService).setPrimaryService(true);
 
       this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
@@ -239,26 +239,30 @@ export class RemootioHomebridgeAccessory {
     // Add primary relay service
     if (config.enablePrimaryRelayOutput !== undefined && config.enablePrimaryRelayOutput === true) {
       this.enablePrimaryRelayOutput = true;
-      this.primaryRelayService = new this.hap.Service.Switch(config.primaryRelayName, 'PRIMARY_RELAY');
-      accessory.addService(this.primaryRelayService);
+      this.primaryRelayService = accessory.addService(
+        this.hap.Service.Switch,
+        config.primaryRelayName,
+        'PRIMARY_RELAY',
+      );
       this.primaryRelayService
         .getCharacteristic(this.hap.Characteristic.On)
         .on('set', this.handlePrimarySet.bind(this))
         .on('get', this.handlePrimaryGet.bind(this));
-      this.primaryRelayService.setCharacteristic(this.hap.Characteristic.Name, config.primaryRelayName);
       this.log.debug('[%s][%s] Primary Relay was added', this.name, config.primaryRelayName);
     }
 
     // Add secondary relay service
     if (config.enableSecondaryRelayOutput !== undefined && config.enableSecondaryRelayOutput === true) {
       this.enableSecondaryRelayOutput = true;
-      this.secondaryRelayService = new this.hap.Service.Switch(config.secondaryRelayName, 'SECONDARY_RELAY');
-      accessory.addService(this.secondaryRelayService);
+      this.secondaryRelayService = accessory.addService(
+        this.hap.Service.Switch,
+        config.secondaryRelayName,
+        'SECONDARY_RELAY',
+      );
       this.secondaryRelayService
         .getCharacteristic(this.hap.Characteristic.On)
         .on('set', this.handleSecondarySet.bind(this))
         .on('get', this.handleSecondaryGet.bind(this));
-      this.secondaryRelayService.setCharacteristic(this.hap.Characteristic.Name, config.secondaryRelayName);
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
 
