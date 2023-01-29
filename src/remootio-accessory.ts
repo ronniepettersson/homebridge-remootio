@@ -245,7 +245,7 @@ export class RemootioHomebridgeAccessory {
         .getCharacteristic(this.hap.Characteristic.On)
         .on('set', this.handlePrimarySet.bind(this))
         .on('get', this.handlePrimaryGet.bind(this));
-      this.primaryRelayService.getCharacteristic(this.hap.Characteristic.Name).updateValue(config.primaryRelayName);
+      this.primaryRelayService.setCharacteristic(this.hap.Characteristic.Name, config.primaryRelayName);
       this.log.debug('[%s][%s] Primary Relay was added', this.name, config.primaryRelayName);
     }
 
@@ -258,7 +258,7 @@ export class RemootioHomebridgeAccessory {
         .getCharacteristic(this.hap.Characteristic.On)
         .on('set', this.handleSecondarySet.bind(this))
         .on('get', this.handleSecondaryGet.bind(this));
-      this.secondaryRelayService.getCharacteristic(this.hap.Characteristic.Name).updateValue(config.secondaryRelayName);
+      this.secondaryRelayService.setCharacteristic(this.hap.Characteristic.Name, config.secondaryRelayName);
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
 
@@ -536,7 +536,7 @@ export class RemootioHomebridgeAccessory {
    */
   primaryTimeoutFunction(): void {
     this.log.debug('[%s] Primary Relay Timer expired', this.name);
-    this.primaryRelayService!.getCharacteristic(this.hap.Characteristic.On).updateValue(false);
+    this.primaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
   }
 
   /*
@@ -560,7 +560,7 @@ export class RemootioHomebridgeAccessory {
    */
   secondaryTimeoutFunction(): void {
     this.log.debug('[%s] Secondary Relay Timer expired', this.name);
-    this.secondaryRelayService!.getCharacteristic(this.hap.Characteristic.On).updateValue(false);
+    this.secondaryRelayService!.setCharacteristic(this.hap.Characteristic.On, false);
   }
 
   /*
