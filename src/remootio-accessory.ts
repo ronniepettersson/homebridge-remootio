@@ -261,8 +261,8 @@ export class RemootioHomebridgeAccessory {
       );
       this.secondaryRelayService
         .getCharacteristic(this.hap.Characteristic.On)
-        .on('set', this.handleSecondarySet.bind(this))
-        .on('get', this.handleSecondaryGet.bind(this));
+        .onSet(this.handleSecondarySet.bind(this))
+        .onGet(this.handleSecondaryGet.bind(this));
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
     }
 
@@ -571,7 +571,7 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the secondary relay
    * and starting a timer to simulate the momentary switch.
    */
-  handleSecondarySet(value: CharacteristicValue, callback: CharacteristicGetCallback): void {
+  handleSecondarySet(value: CharacteristicValue): void {
     // call On if not remootio-1 and if value is true
     if (this.remootioVersion !== 'remootio-1') {
       this.log.debug('[%s] handleSecondarySet: value: %s', this.name, value);
@@ -589,7 +589,6 @@ export class RemootioHomebridgeAccessory {
         this.remootioVersion,
       );
     }
-    callback(null);
   }
 
   handlePrimaryGet(callback: CharacteristicGetCallback): void {
@@ -597,8 +596,8 @@ export class RemootioHomebridgeAccessory {
     callback(null, this.primaryRelayState);
   }
 
-  handleSecondaryGet(callback: CharacteristicGetCallback): void {
+  handleSecondaryGet(): boolean {
     this.log.debug('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
-    callback(null, this.secondaryRelayState);
+    return this.secondaryRelayState;
   }
 }
