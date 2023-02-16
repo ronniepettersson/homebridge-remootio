@@ -121,14 +121,17 @@ export class RemootioHomebridgeAccessory {
 
   private enablePrimaryRelayOutput = false;
   private enableSecondaryRelayOutput = false;
+  private enableDoorbellInput = false;
 
   private primaryRelayService!: Service;
   private secondaryRelayService!: Service;
+  private doorbellService!: Service;
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
   private primaryRelayState = false;
   private secondaryRelayState = false;
+  private dorrbellState = false;
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
@@ -203,7 +206,13 @@ export class RemootioHomebridgeAccessory {
       accessory.removeService(secondaryRelayService);
     }
 
-    // Add garage door opener as long as primary replay is not enabled
+    const doorbellService = accessory.getService(this.hap.Service.Doorbell);
+    if (doorbellService) {
+      this.log.debug('[%s][%s] Removing doorbellService', this.name, doorbellService.displayName);
+      accessory.removeService(doorbellService);
+    }
+
+    // Add garage door opener as long as primary relay is not enabled
     if (!config.enablePrimaryRelayOutput) {
       // Add the garage door opener service to the accessory.
       if (config.garageDoorName !== undefined && config.garageDoorName !== '') {
@@ -246,8 +255,8 @@ export class RemootioHomebridgeAccessory {
       );
       this.primaryRelayService
         .getCharacteristic(this.hap.Characteristic.On)
-        .on('set', this.handlePrimarySet.bind(this))
-        .on('get', this.handlePrimaryGet.bind(this));
+        .onSet(this.handlePrimarySet.bind(this))
+        .onGet(this.handlePrimaryGet.bind(this));
       this.log.debug('[%s][%s] Primary Relay was added', this.name, config.primaryRelayName);
     }
 
@@ -264,6 +273,16 @@ export class RemootioHomebridgeAccessory {
         .onSet(this.handleSecondarySet.bind(this))
         .onGet(this.handleSecondaryGet.bind(this));
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
+    }
+
+    // Add doorbell service
+    if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
+      this.enableDoorbellInput = true;
+      this.doorbellService = accessory.addService(this.hap.Service.Doorbell, config.doorbellName);
+      this.doorbellService
+        .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
+        .onGet(this.handleDoorbellGet.bind(this));
+      this.log.debug('[%s][%s] Doorbell was added', this.name, config.doorbellName);
     }
 
     // Update the manufacturer information for this device.
@@ -356,6 +375,15 @@ export class RemootioHomebridgeAccessory {
             } else {
               this.setCurrentDoorState('opening');
             }
+          }
+        }
+        if (this.doorbellService) {
+          if (decryptedPayload.event.type === 'DoorbellPushed') {
+            //send event that doorbell has been pushed
+            this.accessory
+              .getService(this.hap.Service.Doorbell)!
+              .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
+              .updateValue(this.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
           }
         }
       }
@@ -547,7 +575,7 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the primary relay
    * and starting a timer to simulate the momentary switch.
    */
-  handlePrimarySet(value: CharacteristicValue, callback: CharacteristicGetCallback): void {
+  async handlePrimarySet(value: CharacteristicValue): Promise<void> {
     this.log.debug('[%s] handlePrimarySet: value: %s', this.name, value);
     if (value) {
       this.device.sendTrigger();
@@ -556,7 +584,6 @@ export class RemootioHomebridgeAccessory {
     } else {
       this.primaryRelayState = false;
     }
-    callback(null);
   }
 
   /*
@@ -591,13 +618,19 @@ export class RemootioHomebridgeAccessory {
     }
   }
 
-  handlePrimaryGet(callback: CharacteristicGetCallback): void {
+  async handlePrimaryGet(): Promise<boolean> {
     this.log.debug('[%s] handlePrimaryGet: value: %s', this.name, this.primaryRelayState);
-    callback(null, this.primaryRelayState);
+    return this.primaryRelayState;
   }
 
   async handleSecondaryGet(): Promise<boolean> {
     this.log.debug('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
     return this.secondaryRelayState;
+  }
+
+  handleDoorbellGet(): number {
+    const currentValue = this.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS;
+    this.log.debug('[%s] handleDoorbellGet: value: %s', this.name, currentValue);
+    return currentValue;
   }
 }
