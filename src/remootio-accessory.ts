@@ -571,7 +571,7 @@ export class RemootioHomebridgeAccessory {
    * This method implements the logic for sending a trigger to the secondary relay
    * and starting a timer to simulate the momentary switch.
    */
-  handleSecondarySet(value: CharacteristicValue): void {
+  async handleSecondarySet(value: CharacteristicValue): Promise<void> {
     // call On if not remootio-1 and if value is true
     if (this.remootioVersion !== 'remootio-1') {
       this.log.debug('[%s] handleSecondarySet: value: %s', this.name, value);
@@ -596,7 +596,7 @@ export class RemootioHomebridgeAccessory {
     callback(null, this.primaryRelayState);
   }
 
-  handleSecondaryGet(): boolean {
+  async handleSecondaryGet(): Promise<boolean> {
     this.log.debug('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
     return this.secondaryRelayState;
   }

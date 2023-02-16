@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.3.6",
+  "version": "1.3.6-feature-15",
   "description": "Homebridge plugin for Remootio devices",
   "main": "dist/index.js",
   "scripts": {
