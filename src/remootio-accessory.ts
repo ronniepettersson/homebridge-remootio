@@ -215,6 +215,7 @@ export class RemootioHomebridgeAccessory {
     if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
       this.enableDoorbellInput = true;
       this.doorbellService = accessory.addService(this.hap.Service.Doorbell, config.doorbellName);
+      this.doorbellService.setPrimaryService(true);
       this.doorbellService
         .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
         .onGet(this.handleDoorbellGet.bind(this));
@@ -234,7 +235,7 @@ export class RemootioHomebridgeAccessory {
 
       // Registering the listeners for the required characteristics
       // https://developers.homebridge.io/#/service/GarageDoorOpener
-      accessory.addService(this.garageDoorOpenerService).setPrimaryService(true);
+      accessory.addService(this.garageDoorOpenerService); //.setPrimaryService(true);
 
       this.garageDoorOpenerService
         .getCharacteristic(this.hap.Characteristic.CurrentDoorState)!
