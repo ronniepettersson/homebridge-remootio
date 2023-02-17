@@ -48,7 +48,7 @@ type RemootioServerHello = {
   apiVersion: number;
   message: string;
   serialNumber?: string;
-  remootioVersion?: 'remootio-1' | 'remootio-2';
+  remootioVersion?: 'remootio-1' | 'remootio-2' | 'remootio-3';
 };
 
 type RemootioChallenge = {
@@ -131,7 +131,6 @@ export class RemootioHomebridgeAccessory {
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
   private primaryRelayState = false;
   private secondaryRelayState = false;
-  private dorrbellState = false;
 
   private currentState = -1; // To detect whether we have recevied an update
   private targetState = -1;
@@ -212,6 +211,16 @@ export class RemootioHomebridgeAccessory {
       accessory.removeService(doorbellService);
     }
 
+    // Add doorbell service
+    if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
+      this.enableDoorbellInput = true;
+      this.doorbellService = accessory.addService(this.hap.Service.Doorbell, config.doorbellName);
+      this.doorbellService
+        .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
+        .onGet(this.handleDoorbellGet.bind(this));
+      this.log.debug('[%s][%s] Doorbell was added', this.name, config.doorbellName);
+    }
+
     // Add garage door opener as long as primary relay is not enabled
     if (!config.enablePrimaryRelayOutput) {
       // Add the garage door opener service to the accessory.
@@ -273,16 +282,6 @@ export class RemootioHomebridgeAccessory {
         .onSet(this.handleSecondarySet.bind(this))
         .onGet(this.handleSecondaryGet.bind(this));
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
-    }
-
-    // Add doorbell service
-    if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
-      this.enableDoorbellInput = true;
-      this.doorbellService = accessory.addService(this.hap.Service.Doorbell, config.doorbellName);
-      this.doorbellService
-        .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
-        .onGet(this.handleDoorbellGet.bind(this));
-      this.log.debug('[%s][%s] Doorbell was added', this.name, config.doorbellName);
     }
 
     // Update the manufacturer information for this device.
