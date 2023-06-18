@@ -61,6 +61,12 @@
                             "required": false,
                             "default": false
                         },
+                        "enableDoorbellInput": {
+                            "title": "Check this box, if the doorbell feature is enabled",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false
+                        },
                         "primaryRelayName": {
                             "title": "Name of primary relay",
                             "type": "string",
@@ -72,6 +78,12 @@
                             "type": "string",
                             "required": false,
                             "default": "Secondary Relay"
+                        },
+                        "doorbellName": {
+                            "title": "Name of doorbell",
+                            "type": "string",
+                            "required": false,
+                            "default": "Doorbell"
                         }
                     }
                 }

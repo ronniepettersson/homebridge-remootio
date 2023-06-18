@@ -18,7 +18,11 @@ First of all make sure that the Remootio Websocket API is enabled `with logging`
 
 The `Gate status sensor` is required for the plugin to appear as a Garage Door Opener in HomeKit. If you don't use, or have the gate status sensor, the plugin will appear as a Switch. For remootio-2 and remootio-3 devices, you can also expose the secondary relay as Switch. 
 
+The Doorbell add-on requires the `Doorbell interface` to be enabled and a push button or doorbell switch to be installed on input 2 (terminal 5).
+
 ## Change log
+1.3.8 Added support for the doorbell add-on.
+
 1.3.4 You can now configure the primary relay as a generic relay. This is useful if you don't have the sensor to indicate if a garage door or gate is open or closed. 
 
 1.3.2 You can now specify the hostname of the Remootio device instead of the ip address.  
@@ -57,8 +61,10 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
                 "garageDoorName": "Garage Door",
                 "enablePrimaryRelayOutput": false,
                 "enableSecondaryRelayOutput": true,
+                "enableDoorbell": true,
                 "primaryRelayName": "Primary Relay",
-                "secondaryRelayName": "Secondary Relay"
+                "secondaryRelayName": "Secondary Relay",
+                "doorbellName": "Doorbell"
             
             },
                 {
@@ -68,8 +74,10 @@ If you are new to Homebridge, please first read the [Homebridge](https://homebri
                 "garageDoorName": "Garage Door",
                 "enablePrimaryRelayOutput": false,
                 "enableSecondaryRelayOutput": true,
+                "enableDoorbell": true,
                 "primaryRelayName": "Primary Relay",
-                "secondaryRelayName": "Secondary Relay"
+                "secondaryRelayName": "Secondary Relay",
+                "doorbellName": "Doorbell"
             },
         ]
     }
