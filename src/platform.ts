@@ -85,40 +85,42 @@ export class RemootioPlatform implements DynamicPlatformPlugin {
       }
     }
 
-    // Iterate through the list of devices in configuration and sync them with what we show HomeKit.
-    for (const device of this.config.devices) {
-      // If we have no IP address or authentication key, something is wrong.
-      if (!device.ipAddress || !device.apiAuthKey) {
-        continue;
-      }
+    if (Object.keys(Object(this.config.devices)).length > 0) {
+      // Iterate through the list of devices in configuration and sync them with what we show HomeKit.
+      for (const device of this.config.devices) {
+        // If we have no IP address or authentication key, something is wrong.
+        if (!device.ipAddress || !device.apiAuthKey) {
+          continue;
+        }
 
-      // Generate this device's unique identifier.
+        // Generate this device's unique identifier.
 
-      const uuid = hap.uuid.generate(device.apiAuthKey);
+        const uuid = hap.uuid.generate(device.apiAuthKey);
 
-      let accessory: PlatformAccessory;
+        let accessory: PlatformAccessory;
 
-      // See if we already know about this accessory or if it's truly new. If it is new, add it to HomeKit.
-      if ((accessory = this.accessories.find((x: PlatformAccessory) => x.UUID === uuid)!) === undefined) {
-        accessory = new Accessory(device.name, uuid);
+        // See if we already know about this accessory or if it's truly new. If it is new, add it to HomeKit.
+        if ((accessory = this.accessories.find((x: PlatformAccessory) => x.UUID === uuid)!) === undefined) {
+          accessory = new Accessory(device.name, uuid);
 
-        this.log('%s: Adding Remootio device to HomeKit with IP address %s.', device.name, device.ipAddress);
+          this.log('%s: Adding Remootio device to HomeKit with IP address %s.', device.name, device.ipAddress);
 
-        // Register this accessory with homebridge and add it to the accessory array so we can track it.
-        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-        this.accessories.push(accessory);
-      }
+          // Register this accessory with homebridge and add it to the accessory array so we can track it.
+          this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+          this.accessories.push(accessory);
+        }
 
-      // Link the accessory to it's device object.
-      accessory.context.device = device;
+        // Link the accessory to it's device object.
+        accessory.context.device = device;
 
-      // Setup the device if it hasn't been configured yet.
-      if (!this.configuredAccessories[accessory.UUID]) {
-        // Adding the device.
-        this.configuredAccessories[accessory.UUID] = new RemootioHomebridgeAccessory(this, accessory);
+        // Setup the device if it hasn't been configured yet.
+        if (!this.configuredAccessories[accessory.UUID]) {
+          // Adding the device.
+          this.configuredAccessories[accessory.UUID] = new RemootioHomebridgeAccessory(this, accessory);
 
-        // Refresh the accessory cache with these values.
-        this.api.updatePlatformAccessories([accessory]);
+          // Refresh the accessory cache with these values.
+          this.api.updatePlatformAccessories([accessory]);
+        }
       }
     }
 
