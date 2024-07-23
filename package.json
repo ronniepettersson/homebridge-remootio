@@ -44,7 +44,7 @@
   "homepage": "https://github.com/ronniepettersson/homebridge-remootio#readme",
   "preferGlobal": true,
   "dependencies": {
-    "@ronniepettersson/remootio-api-client": "^2.0.9"
+    "@ronniepettersson/remootio-api-client": "^2.0.10"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
