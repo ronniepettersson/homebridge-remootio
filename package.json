@@ -44,8 +44,7 @@
   "homepage": "https://github.com/ronniepettersson/homebridge-remootio#readme",
   "preferGlobal": true,
   "dependencies": {
-    "@ronniepettersson/remootio-api-client": "^2.0.10",
-    "hap-nodejs": "^1.1.0"
+    "@ronniepettersson/remootio-api-client": "^2.0.10"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
