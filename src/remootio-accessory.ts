@@ -502,8 +502,6 @@ export class RemootioHomebridgeAccessory {
       // Always return current state, so that the server does not emit an event to HAP
       callback(null, this.currentState);
     }
-    // Always send a query request to the garage door opener. When the request returned, send the event via setCurrentDoorState()
-    this.device.sendQuery();
   }
 
   getTargetStateHandler(callback: CharacteristicGetCallback): void {
