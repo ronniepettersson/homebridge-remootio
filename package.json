@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Homebridge plugin for Remootio devices",
   "main": "dist/index.js",
   "scripts": {
@@ -44,7 +44,7 @@
   "homepage": "https://github.com/ronniepettersson/homebridge-remootio#readme",
   "preferGlobal": true,
   "dependencies": {
-    "@ronniepettersson/remootio-api-client": "^2.0.10"
+    "@ronniepettersson/remootio-api-client": "^2.0.11"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
