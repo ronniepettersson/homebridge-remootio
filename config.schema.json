@@ -67,6 +67,12 @@
                             "required": false,
                             "default": false
                         },
+                        "enableContactSensorInput": {
+                            "title": "Check this box, if the contact sensor feature is enabled. Enabling this will disable the doorbell feature",
+                            "type": "boolean",
+                            "required": false,
+                            "default": false
+                        },
                         "primaryRelayName": {
                             "title": "Name of primary relay",
                             "type": "string",

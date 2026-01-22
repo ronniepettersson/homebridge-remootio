@@ -1,6 +1,6 @@
 {
   "name": "homebridge-remootio",
-  "version": "1.4.3",
+  "version": "1.4.4-issue-23",
   "description": "Homebridge plugin for Remootio devices",
   "main": "dist/index.js",
   "scripts": {
@@ -37,6 +37,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "author": "Ronnie Pettersson",
+  "copyright": "Copyright (C) 2020-2026 Ronnie Pettersson. All rights reserved",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/ronniepettersson/homebridge-remootio/issues"

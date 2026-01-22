@@ -1,4 +1,4 @@
-/* Copyright (C) 2020 Ronnie Pettersson. All rights reserved
+/* Copyright (C) 2020-2026 Ronnie Pettersson. All rights reserved
  *
  *  remootio-accessory.ts: Base class for Remootio accessories
  *
@@ -122,10 +122,12 @@ export class RemootioHomebridgeAccessory {
   private enablePrimaryRelayOutput = false;
   private enableSecondaryRelayOutput = false;
   private enableDoorbellInput = false;
+  private enableContactSensorInput = false;
 
   private primaryRelayService!: Service;
   private secondaryRelayService!: Service;
   private doorbellService!: Service;
+  private contactSensorService!: Service;
 
   private readonly currentDoorState!: typeof Characteristic.CurrentDoorState;
   private readonly targetDoorState!: typeof Characteristic.TargetDoorState;
@@ -211,8 +213,23 @@ export class RemootioHomebridgeAccessory {
       accessory.removeService(doorbellService);
     }
 
-    // Add doorbell service
-    if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
+    const contactSensorService = accessory.getService(this.hap.Service.ContactSensor);
+    if (contactSensorService) {
+      this.log.debug('[%s][%s] Removing contactSensorService', this.name, contactSensorService.displayName);
+      accessory.removeService(contactSensorService);
+    }
+
+        // Add contact sensor service
+    if (config.enableContactSensorInput !== undefined && config.enableContactSensorInput === true) {
+      this.enableContactSensorInput = true;
+      this.contactSensorService = accessory.addService(this.hap.Service.ContactSensor, config.contactSensorName);
+      this.contactSensorService
+        .getCharacteristic(this.hap.Characteristic.ContactSensorState)
+        .onGet(this.handleContactSensorGet.bind(this));
+      this.log.debug('[%s][%s] Contact Sensor was added', this.name, config.contactSensorName);
+    } 
+     // Add doorbell service
+    else if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
       this.enableDoorbellInput = true;
       this.doorbellService = accessory.addService(this.hap.Service.Doorbell, config.doorbellName);
       this.doorbellService.setPrimaryService(true);
@@ -221,6 +238,8 @@ export class RemootioHomebridgeAccessory {
         .onGet(this.handleDoorbellGet.bind(this));
       this.log.debug('[%s][%s] Doorbell was added', this.name, config.doorbellName);
     }
+
+
 
     // Add garage door opener as long as primary relay is not enabled
     if (!config.enablePrimaryRelayOutput) {
@@ -384,6 +403,21 @@ export class RemootioHomebridgeAccessory {
               .getService(this.hap.Service.Doorbell)!
               .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
               .updateValue(this.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS);
+          }
+        }
+        if (this.contactSensorService) {
+          if (decryptedPayload.event.type === 'StateChange' && decryptedPayload.event.state === 'closed') {
+            //send event that contact sensor has been triggered
+            this.accessory
+              .getService(this.hap.Service.ContactSensor)!
+              .getCharacteristic(this.hap.Characteristic.ContactSensorState)
+              .updateValue(this.hap.Characteristic.ContactSensorState.CONTACT_DETECTED);
+          } else if (decryptedPayload.event.type === 'StateChange' && decryptedPayload.event.state === 'open') {
+            //send event that contact sensor has been released
+            this.accessory
+              .getService(this.hap.Service.ContactSensor)!
+              .getCharacteristic(this.hap.Characteristic.ContactSensorState)
+              .updateValue(this.hap.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
           }
         }
       }
@@ -629,6 +663,12 @@ export class RemootioHomebridgeAccessory {
   handleDoorbellGet(): number {
     const currentValue = this.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS;
     this.log.debug('[%s] handleDoorbellGet: value: %s', this.name, currentValue);
+    return currentValue;
+  }
+
+  handleContactSensorGet(): number {
+    const currentValue = this.hap.Characteristic.ContactSensorState.CONTACT_DETECTED;
+    this.log.debug('[%s] handleContactSensorGet: value: %s', this.name, currentValue);
     return currentValue;
   }
 }
