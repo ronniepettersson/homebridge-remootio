@@ -432,6 +432,23 @@ export class RemootioHomebridgeAccessory {
           if (this.garageDoorOpenerService) {
             this.setCurrentDoorState(decryptedPayload.response.state);
           }
+          if(this.contactSensorService){
+            if(decryptedPayload.response.state === 'open'){
+              //send event that contact sensor has been released
+              this.accessory
+                .getService(this.hap.Service.ContactSensor)!
+                .getCharacteristic(this.hap.Characteristic.ContactSensorState)
+                .updateValue(this.hap.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+              this.log.debug('[%s] ContactSensor: %s Contact Not Detected', this.name, this.accessory.displayName);
+            } else if(decryptedPayload.response.state === 'closed'){
+              //send event that contact sensor has been triggered
+              this.accessory
+                .getService(this.hap.Service.ContactSensor)!
+                .getCharacteristic(this.hap.Characteristic.ContactSensorState)
+                .updateValue(this.hap.Characteristic.ContactSensorState.CONTACT_DETECTED);
+              this.log.debug('[%s] ContactSensor: %s Contact Detected', this.name, this.accessory.displayName);
+            }
+          }
         }
       }
     } else {
