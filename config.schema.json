@@ -91,7 +91,7 @@
                             "required": false,
                             "default": "Doorbell"
                         },
-                        "contact": {
+                        "contactSensorName": {
                             "title": "Name of contact sensor",
                             "type": "string",
                             "required": false,
