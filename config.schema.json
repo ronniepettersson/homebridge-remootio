@@ -90,6 +90,12 @@
                             "type": "string",
                             "required": false,
                             "default": "Doorbell"
+                        },
+                        "contact": {
+                            "title": "Name of contact sensor",
+                            "type": "string",
+                            "required": false,
+                            "default": "Contact Sensor"
                         }
                     }
                 }
