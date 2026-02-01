@@ -293,12 +293,12 @@ export class RemootioHomebridgeAccessory {
     if (config.enableSecondaryRelayOutput !== undefined && config.enableSecondaryRelayOutput === true) {
       this.enableSecondaryRelayOutput = true;
       this.secondaryRelayService = accessory.addService(
-        this.hap.Service.Switch,
+        this.hap.Service.StatelessProgrammableSwitch,
         config.secondaryRelayName,
         'SECONDARY_RELAY',
       );
       this.secondaryRelayService
-        .getCharacteristic(this.hap.Characteristic.On)
+        .getCharacteristic(this.hap.Characteristic.ProgrammableSwitchEvent)
         .onSet(this.handleSecondarySet.bind(this))
         .onGet(this.handleSecondaryGet.bind(this));
       this.log.debug('[%s][%s] Secondary Relay was added', this.name, config.secondaryRelayName);
@@ -674,9 +674,10 @@ export class RemootioHomebridgeAccessory {
     return this.primaryRelayState;
   }
 
-  async handleSecondaryGet(): Promise<boolean> {
-    this.log.debug('[%s] handleSecondaryGet: value: %s', this.name, this.secondaryRelayState);
-    return this.secondaryRelayState;
+  async handleSecondaryGet(): Promise<number>{
+    const currentValue = this.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS;
+    this.log.debug('[%s] handleSecondaryGet: value: SinglePress', this.name);
+    return currentValue;
   }
 
   handleDoorbellGet(): number {
