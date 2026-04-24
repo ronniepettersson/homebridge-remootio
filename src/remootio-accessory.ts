@@ -225,8 +225,9 @@ export class RemootioHomebridgeAccessory {
       this.contactSensorService = accessory.addService(this.hap.Service.ContactSensor, config.contactSensorName);
       this.contactSensorService
         .getCharacteristic(this.hap.Characteristic.ContactSensorState)
-        .onGet(this.handleContactSensorGet.bind(this));
-      this.log.debug('[%s][%s] Contact Sensor was added', this.name, config.contactSensorName);
+        .onGet(this.handleContactSensorGet.bind(this))
+        .updateValue(this.hap.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      this.log.debug('[%s][%s] Contact Sensor was added', this.name, config.contactSensorName,config.contactSensorName);
     } 
      // Add doorbell service
     else if (config.enableDoorbellInput !== undefined && config.enableDoorbellInput === true) {
